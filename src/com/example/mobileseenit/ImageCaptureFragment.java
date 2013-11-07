@@ -11,7 +11,6 @@ import java.util.List;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,7 +23,6 @@ import android.hardware.Camera.PictureCallback;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -32,10 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 public class ImageCaptureFragment extends Fragment implements OnTouchListener, FocusManager.Callback, OnClickListener,Camera.AutoFocusCallback, SurfaceHolder.Callback{
 	final int tab_to_focus = 0;
@@ -187,7 +182,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
     private Camera.Size getPreSize(Camera.Parameters para){
     	
     	List<Camera.Size> previewSizes = para.getSupportedPreviewSizes();
-    	Camera.Size optimal = getOptimal(previewSizes, (double) 4.0 / 3.0);
+    	Camera.Size optimal = getOptimal(previewSizes, 4.0 / 3.0);
     	if(optimal == null){
     		optimal = previewSizes.get(0);
         	for(int i=0; i<previewSizes.size();i++){
