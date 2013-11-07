@@ -18,6 +18,14 @@ public class FlickrFragment extends Fragment implements OnTouchListener,  OnClic
 				container, false);
 		return rootView;
 	}
+	
+	//Search button
+	public void searchFlickr(View view) {
+		
+		
+	}
+		 
+		 
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
