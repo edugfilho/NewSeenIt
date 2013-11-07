@@ -1,5 +1,7 @@
 package com.example.mobileseenit;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.ActionBar;
@@ -45,11 +47,16 @@ public class MainActivity extends FragmentActivity implements
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
+		List<Fragment> fragments = new ArrayList<Fragment>();    
+		fragments.add(new DummySectionFragment());   		//  replace it with custom "ViewImageFragment"
+		fragments.add(new ImageCaptureFragment());
+		fragments.add(new DummySectionFragment());          //  replace it with custom "SettingsFragment"
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getSupportFragmentManager());
+				getSupportFragmentManager(),fragments);
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -108,9 +115,15 @@ public class MainActivity extends FragmentActivity implements
 	 * one of the sections/tabs/pages.
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
+		
+		private List<Fragment> fragments;
+		
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
+		}
+		public SectionsPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+			super(fm);
+			this.fragments = fragments;
 		}
 
 		@Override
@@ -118,11 +131,12 @@ public class MainActivity extends FragmentActivity implements
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
-			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-			fragment.setArguments(args);
-			return fragment;
+			
+			// Fragment fragment = new DummySectionFragment();
+			// Bundle args = new Bundle();
+			// args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+			// fragment.setArguments(args);
+			return fragments.get(position);
 		}
 
 		@Override
@@ -167,8 +181,7 @@ public class MainActivity extends FragmentActivity implements
 					container, false);
 			TextView dummyTextView = (TextView) rootView
 					.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
+			dummyTextView.setText(Integer.toString(1));
 			return rootView;
 		}
 	}
