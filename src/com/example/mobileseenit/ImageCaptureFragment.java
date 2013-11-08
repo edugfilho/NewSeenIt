@@ -170,7 +170,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	@Override
 	public void onAutoFocus(boolean success, Camera camera) {
 		// TODO Auto-generated method stub
-		List<Area> areas = para.getFocusAreas();
+		List<Area> areas = mCamera.getParameters().getFocusAreas();
     	int left = areas.get(0).rect.left;
     	Log.d("left:", "left" + left);
 		mFManager.onAutoFocus(success, type);
@@ -234,6 +234,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		para.setFocusAreas(focusArea);
 		if(para.getMaxNumMeteringAreas()>0)
 			para.setMeteringAreas(meteringArea);
+		mCamera.setParameters(para);
 	}
 
     /*
