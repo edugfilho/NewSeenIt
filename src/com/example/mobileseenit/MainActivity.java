@@ -11,12 +11,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -48,10 +45,13 @@ public class MainActivity extends FragmentActivity implements
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		
+		//Add your fragments here
 		List<Fragment> fragments = new ArrayList<Fragment>();    
-		fragments.add(new DummySectionFragment());   		//  replace it with custom "ViewImageFragment"
+		fragments.add(new MainFragment());   		//  replace it with custom "ViewImageFragment"
 		fragments.add(new ImageCaptureFragment());
-		fragments.add(new DummySectionFragment());          //  replace it with custom "SettingsFragment"
+		fragments.add(new SettingsFragment());
+		fragments.add(new FlickrFragment());
+		fragments.add(new InstagramFragment());
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
@@ -142,48 +142,30 @@ public class MainActivity extends FragmentActivity implements
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 3;
+			return 5;
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
 			Locale l = Locale.getDefault();
 			switch (position) {
+			// TODO switch these back to R.String properties
 			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
+				//return getString(R.string.title_section1).toUpperCase(l);
+				return "Main";
 			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
+				return "Capture";
 			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
+				return "Settings";
+			case 3:
+				return "FlickrTest";
+			case 4:
+				return "InstaTest";
 			}
 			return null;
 		}
 	}
 
-	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
 
-		public DummySectionFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
-					container, false);
-			TextView dummyTextView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(1));
-			return rootView;
-		}
-	}
 
 }
