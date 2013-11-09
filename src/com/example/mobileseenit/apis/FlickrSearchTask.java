@@ -21,20 +21,30 @@ import com.example.mobileseenit.FlickrFragment;
 
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
-	FlickrFragment g;
-	Flickr f;
-	ArrayList<Bitmap> photos;
+	// Number of images to load at once.
+	private static final int LOAD_COUNT = 5;
+
+	// API key
+	private static final String API_KEY = "af76271af34e193bd2f002eb32032e01";
+
+	// Secret Key
+	private static final String SECRET_KEY = "b7b96e8ab7032484";
+
+	// Reference to the calling fragment (flickr)
+	private FlickrFragment g;
+
+	// Our FlickrJ object
+	private Flickr f;
+
+	// Array of bitmaps to return to the fragment
+	private ArrayList<Bitmap> photos;
 
 	public FlickrSearchTask(FlickrFragment g) {
 
 		this.g = g;
 		// Setup flickrJ object
 		try {
-			f = new Flickr(
-					// API key
-					"af76271af34e193bd2f002eb32032e01",
-					// Secret
-					"b7b96e8ab7032484", new REST());
+			f = new Flickr(API_KEY, SECRET_KEY, new REST());
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -53,8 +63,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	}
 
 	// The actual search method
-	private String search(String... searchTerms)
-			throws IOException {
+	private String search(String... searchTerms) throws IOException {
 
 		// Initialize list of imageviews
 		photos = new ArrayList<Bitmap>();
@@ -72,20 +81,21 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		PhotosInterface photosInterface = f.getPhotosInterface();
 		// Execute search with entered tags
 		try {
-			//Search params search(SearchParameters params, int perPage, int page) 
-			PhotoList photoList = photosInterface.search(searchParams, 1, 1);
+			// Search params search(SearchParameters params, int perPage, int
+			// page)
+			PhotoList photoList = photosInterface.search(searchParams,
+					LOAD_COUNT, 1);
 			// get search result and fetch the photo object and get small square
 			// imag's url
 			if (photoList != null) {
-				
+
 				// Get search result and check the size of photo result
 				for (int i = 0; i < photoList.size(); i++) {
 					// get photo object
 					Photo photo = (Photo) photoList.get(i);
-					
-					//construct url
-					//http://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
-					//http://farm9.staticflickr.com/8512/f88a24ede9.jpg
+
+					// construct url
+					// http://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
 					StringBuilder urlBuilder = new StringBuilder();
 					urlBuilder.append("http://farm");
 					urlBuilder.append(photo.getFarm());
@@ -105,20 +115,20 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		}
 		return "done";
 	}
-	
-	 protected Bitmap process(String url) {
-	        String urldisplay = url;
-	        Bitmap mIcon11 = null;
-	        try {
-	            InputStream in = new java.net.URL(urldisplay).openStream();
-	            //in.reset();
-	            mIcon11 = BitmapFactory.decodeStream(in);
-	        } catch (Exception e) {
-	            Log.e("Error", e.getMessage());
-	            e.printStackTrace();
-	        }
-	        return mIcon11;
-	    }
+
+	protected Bitmap process(String url) {
+		String urldisplay = url;
+		Bitmap mIcon11 = null;
+		try {
+			InputStream in = new java.net.URL(urldisplay).openStream();
+			// in.reset();
+			mIcon11 = BitmapFactory.decodeStream(in);
+		} catch (Exception e) {
+			Log.e("Error", e.getMessage());
+			e.printStackTrace();
+		}
+		return mIcon11;
+	}
 
 	// onPostExecute displays the results of the AsyncTask.
 	@Override
