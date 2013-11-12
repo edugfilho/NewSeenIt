@@ -131,7 +131,8 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		preLayout.setRatio(nRatio);
 		Log.i("pic size: ", "width:" + picSize.width + "height:" + picSize.height + "ratio: " + nRatio);
 		Camera.Size preSize = getPreSize(para);
-		para.setPreviewSize(preSize.height, preSize.width);
+		para.setPreviewSize(preSize.width, preSize.height);
+		
 		/*
 		 * These cannot work on my Samsung device.
 		 * You guys can try on yours.
@@ -260,7 +261,9 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
     	@Override
     	public void onPictureTaken(byte[] data, Camera camera) {
     		// TODO Auto-generated method stub
-    		mBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+    		BitmapFactory.Options opt = new BitmapFactory.Options();
+    		opt.inSampleSize = 8;
+    		mBitmap = BitmapFactory.decodeByteArray(data, 0, data.length,opt);
             Bitmap modifiedbMap;
             int orientation;
             if(mBitmap.getHeight()<mBitmap.getWidth()){
