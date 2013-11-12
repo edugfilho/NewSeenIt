@@ -8,5 +8,10 @@
     <string name="title_section3">Section 3</string>
     <string name="title_activity_main_fragment">MainFragment</string>
     <string name="hello_world">Hello world!</string>
-
+    <string name="insta_client_id">de00d8bc08c2444a85734aa64cc2dd28</string>
+    <string name="insta_client_secret">061e6fc2c15845e89e8daf10ed046852</string>
+	<string name="instagram_id">eaae27bb723146f2817f91483e21cd23</string>
+    <string name="instagram_secret">71feae5ed7e94ababc7fe5d27555feee</string>
+	<string name="callbackurl">http://varundroid.blog.com</string>
+    
 </resources>
