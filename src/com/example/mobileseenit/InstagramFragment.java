@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
-import org.jinstagram.auth.model.Token;
-
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -26,11 +26,11 @@ import android.view.animation.ScaleAnimation;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.koushikdutta.urlimageviewhelper.UrlImageViewCallback;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
@@ -39,7 +39,6 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 		OnClickListener, LocationListener {
 
 	private String stringTestText = "what?";
-	private static final Token EMPTY_TOKEN = null;
 
 	private LocationManager locationManager;
 	private String provider;
@@ -47,10 +46,9 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 	public Double lng;
 	TreeMap<String, String> imgUrlDistance;
 	ImageView selectedImage;
-	Gallery gallery;
 
 	private ListView listView;
-	private InstagramAdapter adapter;
+	private InstagramAdapter instaAdapter;
 
 	private static final String SEARCH_URL = "https://api.instagram.com/v1/media/search";
 
@@ -60,7 +58,6 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 
 		View rootView = inflater.inflate(R.layout.fragment_instagram,
 				container, false);
-	
 
 		if (setGpsCoord()) {
 
@@ -81,18 +78,18 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 		} else {
 			setText("Location not found");
 		}
-		listView = (ListView) rootView.findViewById(R.id.resultss);
-		adapter = new InstagramAdapter(getActivity());
-		GridAdapter a = new GridAdapter(adapter);
+		listView = (ListView) rootView.findViewById(R.id.results);
+		instaAdapter = new InstagramAdapter(getActivity());
+		GridAdapter a = new GridAdapter(instaAdapter);
 		listView.setAdapter(a);
-		adapter.clear();
-		
+		instaAdapter.clear();
+
 		getActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				for (TreeMap.Entry<String, String> entry : imgUrlDistance
 						.entrySet()) {
-					adapter.add(entry.getValue());
+					instaAdapter.add(entry.getValue());
 				}
 			}
 		});
@@ -101,13 +98,18 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 	}
 
 	public boolean setGpsCoord() {
+
 		// Get the location manager
 		locationManager = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
-		// Define the criteria how to select the locatioin provider -> use
+		// Define the criteria how to select the locatio in provider -> use
 		// default
 		Criteria criteria = new Criteria();
 		provider = locationManager.getBestProvider(criteria, false);
+
+		// Provider should come in place of "gps" but getBestProvider always
+		// chooses Network and location ends up null, so I'll let "gps" there
+		// until I know what's going on
 		Location location = locationManager.getLastKnownLocation("gps");
 		if (location != null) {
 			System.out.println("Provider " + provider + " has been selected.");
@@ -174,6 +176,8 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 	}
 
 	private class GridAdapter extends BaseAdapter {
+		Adapter mAdapter;
+
 		public GridAdapter(Adapter adapter) {
 			mAdapter = adapter;
 			mAdapter.registerDataSetObserver(new DataSetObserver() {
@@ -190,8 +194,6 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 				}
 			});
 		}
-
-		Adapter mAdapter;
 
 		@Override
 		public int getCount() {
@@ -225,12 +227,43 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 				int i = position * 4 + child;
 				LinearLayout c = (LinearLayout) l.getChildAt(child);
 				c.removeAllViews();
+
 				if (i < mAdapter.getCount()) {
-					c.addView(mAdapter.getView(i, null, null));
+					View addedView = mAdapter.getView(i, null, null);
+					addedView.setTag(i);
+					addedView.setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							showDialog(v);
+							
+						}
+
+					});
+
+					c.addView(addedView);
+
 				}
 			}
-
 			return convertView;
+		}
+
+		void showDialog(View v) {
+			/*Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(),
+					Bitmap.Config.ARGB_8888);
+			BitmapDrawable d = new BitmapDrawable(getResources(), b);
+			
+			String stuff = Integer.toString(v.getWidth())
+					+ Integer.toString(v.getHeight());
+
+			Toast.makeText(getActivity(), stuff, Toast.LENGTH_SHORT).show();*/
+			Integer position = (Integer) v.getTag();
+			String imgUrl = (String) mAdapter.getItem(position);
+			FragmentTransaction ft = getActivity().getFragmentManager()
+					.beginTransaction();
+			ImageDialogSeenIt newFragment = ImageDialogSeenIt.newInstance(imgUrl);
+
+			newFragment.show(ft, "dialog");
 		}
 
 		private class Row extends ArrayList {
