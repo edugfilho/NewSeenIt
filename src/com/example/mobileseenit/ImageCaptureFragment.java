@@ -179,7 +179,6 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	}
 	
 	
-    
     private Camera.Size getPreSize(Camera.Parameters para){
     	
     	List<Camera.Size> previewSizes = para.getSupportedPreviewSizes();
