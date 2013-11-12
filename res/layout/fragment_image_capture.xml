@@ -8,12 +8,9 @@
 	    android:id="@+id/CameraLayout"
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
-	    android:layout_alignParentBottom="true"
-	    android:layout_alignParentTop="true"
 	    android:layout_centerInParent="true"
 	    android:layout_gravity="center"
-	    android:paddingBottom="1dp"
-	    android:paddingTop="1dp" >
+	    android:padding="1dp" >
   
         <SurfaceView
             android:id="@+id/mySurface"
