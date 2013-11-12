@@ -140,7 +140,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		 * para.setPictureSize(picSize.height, picSize.width);
 		*/
 		
-		mCamera.setParameters(para);
+		//mCamera.setParameters(para);
 		mFManager = new FocusManager(para,focus,this);
 		mCamera.startPreview();
 
@@ -609,4 +609,3 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
     }
 
 }
->>>>>>> f1fbed8811b1a1b34e5a83c1a143b7005c30e841
