@@ -31,13 +31,17 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 public class ImageCaptureFragment extends Fragment implements OnTouchListener, FocusManager.Callback, OnClickListener,Camera.AutoFocusCallback, SurfaceHolder.Callback{
 	final int tab_to_focus = 0;
 	final int default_focus = 1;
+	final int busy = 0;
+	final int idle = 1;
 	SurfaceView mSurface;
 	SurfaceHolder holder;
 	ImageButton mButton;
+	ImageView flashIndicator;
 	Camera mCamera;
 	Focus focus;
 	Bitmap mBitmap; 
@@ -45,12 +49,15 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	PreviewLayout preLayout;
 	Parameters para;
 	int type;
+	int state;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		//getActivity().requestWindowFeature(Window.FEATURE_NO_TITLE);
 		//getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		state = idle;
+		type = default_focus;
 		View rootView = inflater.inflate(R.layout.fragment_image_capture,
 				container, false);
 		return rootView;
@@ -61,7 +68,9 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 		mSurface = (SurfaceView)getView().findViewById(R.id.mySurface);	
-		mSurface = (SurfaceView)getView().findViewById(R.id.mySurface);	
+		mSurface = (SurfaceView)getView().findViewById(R.id.mySurface);
+		flashIndicator = (ImageView)getView().findViewById(R.id.flashIndicator);
+		flashIndicator.setOnTouchListener(new flashIndicatorOntouchListener());
 		mButton = (ImageButton)getView().findViewById(R.id.myBtn);
 		mButton.setOnClickListener(this);
 		holder = mSurface.getHolder();
@@ -70,6 +79,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		focus.showFocus();
 		preLayout = (PreviewLayout)getView().findViewById(R.id.CameraLayout);
 		mSurface.setOnTouchListener(this);
+		
 	}
 
 
@@ -100,13 +110,17 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 
 	@Override
 	public void onClick(View arg0) {
-		if(type == tab_to_focus)
-			capture();
-		else{
-			type = default_focus;
-			mCamera.autoFocus(this); 
-		}
-     
+		Log.d("type", "type is: "+type);
+		Log.d("state", "state is: "+state);
+		if(state == idle){
+			state = busy;
+			if(type == tab_to_focus)
+				capture();
+			else{
+				type = default_focus;
+				mCamera.autoFocus(this); 
+			}
+		} 
 	}
 	
 	@Override
@@ -114,7 +128,12 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		if(mCamera.getParameters().getMaxNumFocusAreas()<=0)
 			return false;
-		return mFManager.onTouch(mSurface.getWidth(),mSurface.getHeight(),me);
+		if(state == idle){
+			state = busy;
+			return mFManager.onTouch(mSurface.getWidth(),mSurface.getHeight(),me);
+		}
+		else
+			return false;
 	}
 	
 	@Override
@@ -122,6 +141,8 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		
 		para = mCamera.getParameters();
+		String flashmode = para.getFlashMode();
+		updateFlashIndicator(flashmode);
 		mCamera.setDisplayOrientation(90);
 		para.setPictureFormat(ImageFormat.JPEG);
 		para.setFocusMode("auto");
@@ -170,11 +191,11 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	
 	@Override
 	public void onAutoFocus(boolean success, Camera camera) {
-		// TODO Auto-generated method stub
-		List<Area> areas = mCamera.getParameters().getFocusAreas();
-    	int left = areas.get(0).rect.left;
-    	Log.d("left:", "left" + left);
+		// TODO Auto-generated method stub	
+		if(type == tab_to_focus)
+			state = idle;
 		mFManager.onAutoFocus(success, type);
+		
 		//mFManager.updateFocus();
 	}
 	
@@ -237,7 +258,18 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 			para.setMeteringAreas(meteringArea);
 		mCamera.setParameters(para);
 	}
-
+    
+    public void updateFlashIndicator(String flashmode){
+    	if(flashmode.equals(Parameters.FLASH_MODE_AUTO)){
+			flashIndicator.setImageResource(R.drawable.flash_auto);
+		}
+		else if(flashmode.equals(Parameters.FLASH_MODE_OFF)){
+			flashIndicator.setImageResource(R.drawable.flash_off);
+		}
+		else if(flashmode.equals(Parameters.FLASH_MODE_ON)){
+			flashIndicator.setImageResource(R.drawable.flash_on);
+		}
+    }
     /*
      * cannot work on my device.
      * 
@@ -254,7 +286,28 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		return myPicSize; 	
     }
     */
+    private final class flashIndicatorOntouchListener implements OnTouchListener{
 
+		@Override
+		public boolean onTouch(View view, MotionEvent me) {
+			// TODO Auto-generated method stub
+			if(para.getFlashMode().equals(Parameters.FLASH_MODE_AUTO)){
+				updateFlashIndicator(Parameters.FLASH_MODE_OFF);
+				para.setFlashMode(Parameters.FLASH_MODE_OFF);		
+			}
+			else if(para.getFlashMode().equals(Parameters.FLASH_MODE_OFF)){
+				updateFlashIndicator(Parameters.FLASH_MODE_ON);
+				para.setFlashMode(Parameters.FLASH_MODE_ON);		
+			}
+			else if(para.getFlashMode().equals(Parameters.FLASH_MODE_ON)){
+				updateFlashIndicator(Parameters.FLASH_MODE_AUTO);
+				para.setFlashMode(Parameters.FLASH_MODE_AUTO);		
+			}
+			mCamera.setParameters(para);
+			return true;
+		}
+    	
+    }
     private final class myPictureCallback implements PictureCallback{
 
     	@Override
@@ -302,6 +355,8 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
             } catch(IOException e){
             	e.printStackTrace();
             }
+            if(state==busy)
+            	state = idle;
     	}    	
     }
 

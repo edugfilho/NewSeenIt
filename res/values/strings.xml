@@ -13,5 +13,6 @@
 	<string name="instagram_id">eaae27bb723146f2817f91483e21cd23</string>
     <string name="instagram_secret">71feae5ed7e94ababc7fe5d27555feee</string>
 	<string name="callbackurl">http://varundroid.blog.com</string>
+	<string name="image_capture_flash">flash</string>
     
 </resources>
