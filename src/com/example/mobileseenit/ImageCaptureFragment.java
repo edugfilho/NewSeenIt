@@ -68,7 +68,6 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 		mSurface = (SurfaceView)getView().findViewById(R.id.mySurface);	
-		mSurface = (SurfaceView)getView().findViewById(R.id.mySurface);
 		flashIndicator = (ImageView)getView().findViewById(R.id.flashIndicator);
 		flashIndicator.setOnTouchListener(new flashIndicatorOntouchListener());
 		mButton = (ImageButton)getView().findViewById(R.id.myBtn);
