@@ -47,9 +47,11 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	Bitmap mBitmap; 
 	FocusManager mFManager;
 	PreviewLayout preLayout;
-	Parameters para;
+	Parameters para = null;
 	int type;
 	int state;
+	
+	boolean previewIsRunning;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,10 +74,10 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		flashIndicator.setOnTouchListener(new flashIndicatorOntouchListener());
 		mButton = (ImageButton)getView().findViewById(R.id.myBtn);
 		mButton.setOnClickListener(this);
-		holder = mSurface.getHolder();
-		holder.addCallback(this);
 		focus = (Focus)getView().findViewById(R.id.focus);
 		focus.showFocus();
+		holder = mSurface.getHolder();
+		holder.addCallback(this);
 		preLayout = (PreviewLayout)getView().findViewById(R.id.CameraLayout);
 		mSurface.setOnTouchListener(this);
 		
@@ -87,9 +89,13 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		super.onPause();
 		Log.d("on pause", "onPause() gets called");
+		this.stopPreview();
 		if (mCamera != null){
             //mCamera.setPreviewCallback(null);
+			focus.showFocus();
+			type = default_focus;
            	holder.removeCallback(this);
+           	holder=null;
             mCamera.release();
             mCamera = null;
         }
@@ -99,11 +105,25 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	@Override
 	public void onResume() {
 		// TODO Auto-generated method stub
-		super.onResume();
+
 		Log.d("on resume", "onResume() gets called");
+		super.onResume();
 		holder = mSurface.getHolder();
 		holder.addCallback(this);
-		
+		holder.setKeepScreenOn(true);
+		if(mCamera==null){
+			mCamera = Camera.open();
+			try {
+				mCamera.setPreviewDisplay(holder);
+				if(para!=null){
+					this.setUpCamera();
+					this.startPreview();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
 	}
 
 
@@ -134,11 +154,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		else
 			return false;
 	}
-	
-	@Override
-	public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
-		// TODO Auto-generated method stub
-		
+	protected void setUpCamera(){
 		para = mCamera.getParameters();
 		String flashmode = para.getFlashMode();
 		updateFlashIndicator(flashmode);
@@ -156,30 +172,58 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		
 		mCamera.setParameters(para);
 		mFManager = new FocusManager(para,focus,this);
-		mCamera.startPreview();
-
 		Log.i("My best presize: ", "width:" + preSize.width + " height: " + preSize.height);
+	}
+	
+	@Override
+	public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
+		// TODO Auto-generated method stub
+		
+		if(para==null)
+			this.setUpCamera();
+		this.startPreview();
+
+		
 	}
 	@Override
 	public void surfaceCreated(SurfaceHolder arg0) {
 		// TODO Auto-generated method stub
-		if(mCamera==null){
+		Log.d("surfaceCreated: ","surfaceCreated");
+		if(mCamera==null)
 			mCamera = Camera.open();
-			try{
-				mCamera.setPreviewDisplay(arg0);
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-		}
+		try{
+			mCamera.setPreviewDisplay(arg0);
+		}catch(IOException e){
+			e.printStackTrace();
+		}	
 	}
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
 		// TODO Auto-generated method stub
+		Log.d("surfaceDestroyed", "surfaceDestroyed");
 		focus.showFocus();
-		mCamera.stopPreview();
-		mCamera.setPreviewCallback(null);
+		type = default_focus;
+		this.stopPreview();
+		holder.removeCallback(this);
+       	holder=null;
 		mCamera.release();
 		mCamera = null;
+	}
+	
+	
+	protected void startPreview(){
+		
+		if(!previewIsRunning&&(mCamera!=null)){
+			mCamera.startPreview();
+			previewIsRunning = true;
+		}
+	}
+protected void stopPreview(){
+		
+		if(previewIsRunning&&(mCamera!=null)){
+			mCamera.stopPreview();
+			previewIsRunning = false;
+		}
 	}
 	
 	@Override
