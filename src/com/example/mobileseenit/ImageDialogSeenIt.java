@@ -7,17 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
+import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class ImageDialogSeenIt extends DialogFragment {
 	private Dialog mDialog;
 	private String imgUrl;
 	private ImageView imgView;
+	private PhotoWrapper pWrapper;
 
-	static ImageDialogSeenIt newInstance(String imgUrl) {
+	public static ImageDialogSeenIt newInstance( PhotoWrapper p) {
 		ImageDialogSeenIt f = new ImageDialogSeenIt();
-		f.imgUrl = imgUrl;
+		f.pWrapper = p;
 		return f;
 	}
 
@@ -26,8 +28,20 @@ public class ImageDialogSeenIt extends DialogFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_dialog, container, false);
+		
+		//Get fields to fill
 		imgView = (ImageView) v.findViewById(R.id.imageDialog);
-		UrlImageViewHelper.setUrlDrawable(imgView, imgUrl);
+		TextView title = (TextView) v.findViewById(R.id.photo_title);
+		TextView link = (TextView) v.findViewById(R.id.photo_link);
+		
+		//Set image
+		imgView.setImageBitmap(pWrapper.getBitmap());
+		
+		//Set details
+		title.setText(pWrapper.getDetailMap().get(PhotoWrapper.TITLE_FIELD));
+		link.setText(pWrapper.getDetailMap().get(PhotoWrapper.LINK_FIELD));
+		
+		//UrlImageViewHelper.setUrlDrawable(imgView, imgUrl);
 		return v;
 	}
 

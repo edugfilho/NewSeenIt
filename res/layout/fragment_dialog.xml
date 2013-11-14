@@ -3,13 +3,25 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:minHeight="1000dp"
-    android:minWidth="1000dp" >
+    android:minWidth="1000dp"
+    android:orientation="vertical" >
 
     <ImageView
         android:id="@+id/imageDialog"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1.49"
+        android:layout_width="match_parent"
+        android:layout_height="352dp"
         android:src="@drawable/focus" />
+
+    <TextView
+        android:id="@+id/photo_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/photo_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
 
 </LinearLayout>

@@ -10,8 +10,6 @@
         android:orientation="vertical" 
         android:gravity="center">
 
- 
-
     </LinearLayout>
 
 </ScrollView>

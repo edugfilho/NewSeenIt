@@ -17,10 +17,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.example.mobileseenit.apis.FlickrSearchTask;
+import com.example.mobileseenit.helpers.PhotoStreamImageView;
+import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class MainActivity extends FragmentActivity implements
 		ActionBar.TabListener {
@@ -30,7 +31,7 @@ public class MainActivity extends FragmentActivity implements
 	ViewPager mViewPager;
 
 	// Currently loaded photos
-	ArrayList<Bitmap> photoList;
+	ArrayList<PhotoWrapper> photoList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		// Inialize photolist
-		photoList = new ArrayList<Bitmap>();
+		photoList = new ArrayList<PhotoWrapper>();
 
 		// Load Flickr images, and add bitmaps to photolist
 		loadFlickr();
@@ -94,13 +95,15 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-	public void displayPhotos(ArrayList<Bitmap> photos) {
+	//Can be called from search methods. Adds the PhotoWrappers to
+	//the current list
+	public void addPhotos(ArrayList<PhotoWrapper> photos) {
 
-		for (Bitmap p : photos) {
+		for (PhotoWrapper p : photos) {
 
 			LinearLayout r = (LinearLayout) findViewById(R.id.photo_stream);
-			r.addView(new PhotoStreamImageView(this, p));
-
+			PhotoStreamImageView newImage = new PhotoStreamImageView(this, p);
+			r.addView(newImage);
 		}
 	}
 

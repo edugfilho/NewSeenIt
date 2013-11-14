@@ -19,6 +19,7 @@ import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
 import com.aetrion.flickr.photos.SearchParameters;
 import com.example.mobileseenit.MainActivity;
+import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
@@ -38,7 +39,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	private Flickr f;
 
 	// Array of bitmaps to return to the fragment
-	private ArrayList<Bitmap> photos;
+	private ArrayList<PhotoWrapper> photos;
 
 	public FlickrSearchTask(Activity g) {
 
@@ -67,7 +68,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	private String search(String... searchTerms) throws IOException {
 
 		// Initialize list of imageviews
-		photos = new ArrayList<Bitmap>();
+		photos = new ArrayList<PhotoWrapper>();
 
 		// initialize SearchParameter object, this object stores the search
 		// keyword
@@ -108,7 +109,10 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 					urlBuilder.append(photo.getSecret());
 					urlBuilder.append(".jpg");
 					Bitmap b = process(urlBuilder.toString());
-					photos.add(b);
+					
+					//Construct new photowrapper for each image.
+					PhotoWrapper newPhoto = new PhotoWrapper(b, photoList.get(i), PhotoWrapper.FLICKR_OBJECT);
+					photos.add(newPhoto);
 				}
 			}
 		} catch (Exception e) {
@@ -134,8 +138,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	// onPostExecute displays the results of the AsyncTask.
 	@Override
 	protected void onPostExecute(String result) {
-		Log.i("alal", result);
-		g.displayPhotos(photos);
+		g.addPhotos(photos);
 	}
 
 }
