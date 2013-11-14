@@ -253,15 +253,15 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	}
     
     public void updateFlashIndicator(String flashmode){
-    	if(flashmode.equals(Parameters.FLASH_MODE_AUTO)){
-			flashIndicator.setImageResource(R.drawable.flash_auto);
-		}
-		else if(flashmode.equals(Parameters.FLASH_MODE_OFF)){
-			flashIndicator.setImageResource(R.drawable.flash_off);
-		}
-		else if(flashmode.equals(Parameters.FLASH_MODE_ON)){
-			flashIndicator.setImageResource(R.drawable.flash_on);
-		}
+//    	if(flashmode.equals(Parameters.FLASH_MODE_AUTO)){
+//			flashIndicator.setImageResource(R.drawable.flash_auto);
+//		}
+//		else if(flashmode.equals(Parameters.FLASH_MODE_OFF)){
+//			flashIndicator.setImageResource(R.drawable.flash_off);
+//		}
+//		else if(flashmode.equals(Parameters.FLASH_MODE_ON)){
+//			flashIndicator.setImageResource(R.drawable.flash_on);
+//		}
     }
     
     private Camera.Size getPicSize(Camera.Parameters para){
@@ -282,19 +282,19 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		@Override
 		public boolean onTouch(View view, MotionEvent me) {
 			// TODO Auto-generated method stub
-			if(para.getFlashMode().equals(Parameters.FLASH_MODE_AUTO)){
-				updateFlashIndicator(Parameters.FLASH_MODE_OFF);
-				para.setFlashMode(Parameters.FLASH_MODE_OFF);		
-			}
-			else if(para.getFlashMode().equals(Parameters.FLASH_MODE_OFF)){
-				updateFlashIndicator(Parameters.FLASH_MODE_ON);
-				para.setFlashMode(Parameters.FLASH_MODE_ON);		
-			}
-			else if(para.getFlashMode().equals(Parameters.FLASH_MODE_ON)){
-				updateFlashIndicator(Parameters.FLASH_MODE_AUTO);
-				para.setFlashMode(Parameters.FLASH_MODE_AUTO);		
-			}
-			mCamera.setParameters(para);
+//			if(para.getFlashMode().equals(Parameters.FLASH_MODE_AUTO)){
+//				updateFlashIndicator(Parameters.FLASH_MODE_OFF);
+//				para.setFlashMode(Parameters.FLASH_MODE_OFF);		
+//			}
+//			else if(para.getFlashMode().equals(Parameters.FLASH_MODE_OFF)){
+//				updateFlashIndicator(Parameters.FLASH_MODE_ON);
+//				para.setFlashMode(Parameters.FLASH_MODE_ON);		
+//			}
+//			else if(para.getFlashMode().equals(Parameters.FLASH_MODE_ON)){
+//				updateFlashIndicator(Parameters.FLASH_MODE_AUTO);
+//				para.setFlashMode(Parameters.FLASH_MODE_AUTO);		
+//			}
+//			mCamera.setParameters(para);
 			return true;
 		}
     	

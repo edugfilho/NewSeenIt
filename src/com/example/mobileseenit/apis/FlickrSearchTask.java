@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -17,7 +18,7 @@ import com.aetrion.flickr.photos.Photo;
 import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
 import com.aetrion.flickr.photos.SearchParameters;
-import com.example.mobileseenit.FlickrFragment;
+import com.example.mobileseenit.MainActivity;
 
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
@@ -31,7 +32,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	private static final String SECRET_KEY = "b7b96e8ab7032484";
 
 	// Reference to the calling fragment (flickr)
-	private FlickrFragment g;
+	private MainActivity g;
 
 	// Our FlickrJ object
 	private Flickr f;
@@ -39,9 +40,9 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	// Array of bitmaps to return to the fragment
 	private ArrayList<Bitmap> photos;
 
-	public FlickrSearchTask(FlickrFragment g) {
+	public FlickrSearchTask(Activity g) {
 
-		this.g = g;
+		this.g = (MainActivity) g;
 		// Setup flickrJ object
 		try {
 			f = new Flickr(API_KEY, SECRET_KEY, new REST());

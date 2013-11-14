@@ -42,7 +42,7 @@ public class FlickrFragment extends Fragment implements OnTouchListener,
 
 		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 		if (networkInfo != null && networkInfo.isConnected()) {
-			FlickrSearchTask searchTask = new FlickrSearchTask(this);
+			FlickrSearchTask searchTask = new FlickrSearchTask(this.getActivity());
 			searchTask.execute();
 
 			// get photos
