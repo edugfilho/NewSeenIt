@@ -145,26 +145,20 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		mCamera.setDisplayOrientation(90);
 		para.setPictureFormat(ImageFormat.JPEG);
 		para.setFocusMode("auto");
-		Camera.Size picSize = para.getPictureSize();
+		Camera.Size picSize = getPicSize(para);
+		para.setPictureSize(picSize.width, picSize.height);
+		//Camera.Size picSize = para.getPictureSize();
 		double nRatio = (double)picSize.width/picSize.height;
 		preLayout.setRatio(nRatio);
 		Log.i("pic size: ", "width:" + picSize.width + "height:" + picSize.height + "ratio: " + nRatio);
-		Camera.Size preSize = getPreSize(para);
+		Camera.Size preSize = getPreSize(para, nRatio);
 		para.setPreviewSize(preSize.width, preSize.height);
-		
-		/*
-		 * These cannot work on my Samsung device.
-		 * You guys can try on yours.
-		 * 
-		 * Camera.Size picSize = getPicSize(para);
-		 * para.setPictureSize(picSize.height, picSize.width);
-		*/
 		
 		mCamera.setParameters(para);
 		mFManager = new FocusManager(para,focus,this);
 		mCamera.startPreview();
 
-		Log.i("My best presize: ", "width:" + preSize.height + " height: " + preSize.width);
+		Log.i("My best presize: ", "width:" + preSize.width + " height: " + preSize.height);
 	}
 	@Override
 	public void surfaceCreated(SurfaceHolder arg0) {
@@ -200,10 +194,10 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	
 	
     
-    private Camera.Size getPreSize(Camera.Parameters para){
+    private Camera.Size getPreSize(Camera.Parameters para, double nRatio){
     	
     	List<Camera.Size> previewSizes = para.getSupportedPreviewSizes();
-    	Camera.Size optimal = getOptimal(previewSizes, 4.0 / 3.0);
+    	Camera.Size optimal = getOptimal(previewSizes, nRatio);
     	if(optimal == null){
     		optimal = previewSizes.get(0);
         	for(int i=0; i<previewSizes.size();i++){
@@ -269,9 +263,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 			flashIndicator.setImageResource(R.drawable.flash_on);
 		}
     }
-    /*
-     * cannot work on my device.
-     * 
+    
     private Camera.Size getPicSize(Camera.Parameters para){
     	
     	Camera.Size myPicSize;
@@ -284,7 +276,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
     	}
 		return myPicSize; 	
     }
-    */
+    
     private final class flashIndicatorOntouchListener implements OnTouchListener{
 
 		@Override
@@ -313,7 +305,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
     	public void onPictureTaken(byte[] data, Camera camera) {
     		// TODO Auto-generated method stub
     		BitmapFactory.Options opt = new BitmapFactory.Options();
-    		opt.inSampleSize = 8;
+    		opt.inSampleSize = 4;
     		mBitmap = BitmapFactory.decodeByteArray(data, 0, data.length,opt);
             Bitmap modifiedbMap;
             int orientation;
