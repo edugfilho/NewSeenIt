@@ -15,5 +15,7 @@
     <string name="callbackurl">http://varundroid.blog.com</string>
     <string name="image_capture_flash">flash</string>
     <string name="title_activity_image_details">ImageDetailsActivity</string>
+    <string name="photo_title_label">Title:</string>
+    <string name="photo_link_label">Link:</string>
 
 </resources>
