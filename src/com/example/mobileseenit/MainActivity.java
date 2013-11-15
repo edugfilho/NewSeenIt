@@ -6,10 +6,6 @@ import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -17,10 +13,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
-import android.widget.LinearLayout;
 
 import com.example.mobileseenit.apis.FlickrSearchTask;
-import com.example.mobileseenit.helpers.PhotoStreamImageView;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class MainActivity extends FragmentActivity implements
@@ -32,6 +26,9 @@ public class MainActivity extends FragmentActivity implements
 
 	// Currently loaded photos
 	ArrayList<PhotoWrapper> photoList;
+	
+	//Fragments
+	MainFragment mainFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +41,13 @@ public class MainActivity extends FragmentActivity implements
 
 		// Add your fragments here
 		List<Fragment> fragments = new ArrayList<Fragment>();
-		fragments.add(new MainFragment());
+		mainFragment = new MainFragment();
+		fragments.add(mainFragment);
 		fragments.add(new ImageCaptureFragment());
 		fragments.add(new SettingsFragment());
-		fragments.add(new FlickrFragment());
-		fragments.add(new InstagramFragment());
-
+		//fragments.add(new FlickrFragment());
+		//fragments.add(new InstagramFragment());
+		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
@@ -77,34 +75,18 @@ public class MainActivity extends FragmentActivity implements
 					.setTabListener(this));
 		}
 
-		// Inialize photolist
-		photoList = new ArrayList<PhotoWrapper>();
-
-		// Load Flickr images, and add bitmaps to photolist
-		loadFlickr();
-	}
-
-	private void loadFlickr() {
-		ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
-		NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-		if (networkInfo != null && networkInfo.isConnected()) {
-			FlickrSearchTask searchTask = new FlickrSearchTask(this);
-			searchTask.execute();
-		}
-
+		photoList = new ArrayList<PhotoWrapper>();	
+		FlickrSearchTask flickrSearch = new FlickrSearchTask(this);
+		flickrSearch.execute();
+		mViewPager.setCurrentItem(0);
 	}
 
 	//Can be called from search methods. Adds the PhotoWrappers to
 	//the current list
 	public void addPhotos(ArrayList<PhotoWrapper> photos) {
 
-		for (PhotoWrapper p : photos) {
-
-			LinearLayout r = (LinearLayout) findViewById(R.id.photo_stream);
-			PhotoStreamImageView newImage = new PhotoStreamImageView(this, p);
-			r.addView(newImage);
-		}
+		photoList.addAll(photos);
+		mainFragment.updateDisplayedPhotos();
 	}
 
 	@Override
@@ -131,6 +113,18 @@ public class MainActivity extends FragmentActivity implements
 	public void onTabReselected(ActionBar.Tab tab,
 			FragmentTransaction fragmentTransaction) {
 	}
+	
+	
+
+	public ArrayList<PhotoWrapper> getPhotoList() {
+		return photoList;
+	}
+
+	public void setPhotoList(ArrayList<PhotoWrapper> photoList) {
+		this.photoList = photoList;
+	}
+
+
 
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
