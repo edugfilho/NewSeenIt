@@ -24,7 +24,7 @@ import com.example.mobileseenit.helpers.PhotoWrapper;
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 	// Number of images to load at once.
-	private static final int LOAD_COUNT = 5;
+	private static final int LOAD_COUNT = 2;
 
 	// API key
 	private static final String API_KEY = "af76271af34e193bd2f002eb32032e01";
