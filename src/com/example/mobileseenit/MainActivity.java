@@ -86,7 +86,8 @@ public class MainActivity extends FragmentActivity implements
 	public void addPhotos(ArrayList<PhotoWrapper> photos) {
 
 		photoList.addAll(photos);
-		mainFragment.updateDisplayedPhotos();
+		if(!mainFragment.isDetached())
+			mainFragment.updateDisplayedPhotos();
 	}
 
 	@Override
@@ -154,13 +155,14 @@ public class MainActivity extends FragmentActivity implements
 			// args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position +
 			// 1);
 			// fragment.setArguments(args);
+			System.out.println("position: " +position);
 			return fragments.get(position);
 		}
 
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 5;
+			return 3;
 		}
 
 		@Override
@@ -175,10 +177,6 @@ public class MainActivity extends FragmentActivity implements
 				return "Capture";
 			case 2:
 				return "Settings";
-			case 3:
-				return "FlickrTest";
-			case 4:
-				return "InstaTest";
 			}
 			return null;
 		}

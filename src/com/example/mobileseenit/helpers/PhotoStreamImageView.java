@@ -65,8 +65,7 @@ public class PhotoStreamImageView extends ImageView implements OnClickListener {
 	//User can click the picture to bring up the image details.
 	@Override
 	public void onClick(View v) {
-		System.out.println("Clicked me!");
-		System.out.println(this.pWrapper.getDetailMap().get(PhotoWrapper.TITLE_FIELD));
+		System.out.println("clicked" +this.pWrapper.getDetailMap().get(PhotoWrapper.TITLE_FIELD));
 		
 		FragmentTransaction ft = ((MainActivity)getContext()).getFragmentManager()
 				.beginTransaction();
