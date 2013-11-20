@@ -14,11 +14,14 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
+import com.example.mobileseenit.apis.FlickrLoginDialog;
 import com.example.mobileseenit.apis.FlickrSearchTask;
+import com.example.mobileseenit.apis.FlickrUser;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class MainActivity extends FragmentActivity implements
-		ActionBar.TabListener {
+		ActionBar.TabListener,
+		FlickrLoginDialog.OnFlickrLoggedInListener{
 
 	// View Pager
 	SectionsPagerAdapter mSectionsPagerAdapter;
@@ -29,6 +32,10 @@ public class MainActivity extends FragmentActivity implements
 	
 	//Fragments
 	MainFragment mainFragment;
+	SettingsFragment settingsFragment;
+	
+	//user objects
+	FlickrUser flickrUser;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,13 +47,13 @@ public class MainActivity extends FragmentActivity implements
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		// Add your fragments here
-		List<Fragment> fragments = new ArrayList<Fragment>();
 		mainFragment = new MainFragment();
+		settingsFragment = new SettingsFragment();
+		List<Fragment> fragments = new ArrayList<Fragment>();
 		fragments.add(mainFragment);
 		fragments.add(new ImageCaptureFragment());
-		fragments.add(new SettingsFragment());
-		//fragments.add(new FlickrFragment());
-		//fragments.add(new InstagramFragment());
+		fragments.add(settingsFragment);
+		
 		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
@@ -182,5 +189,28 @@ public class MainActivity extends FragmentActivity implements
 			return null;
 		}
 	}
+
+
+
+	public FlickrUser getFlickrUser() {
+		return flickrUser;
+	}
+
+	public void setFlickrUser(FlickrUser flickrUser) {
+		this.flickrUser = flickrUser;
+	}
+
+	/**
+	 * Interface with FlickrLoginDialog
+	 */
+	@Override
+	public void onFlickLoggedIn(FlickrUser u) {
+		System.out.println("FLickr User Logged in!");
+		this.flickrUser = u;
+		
+		//Update info
+		settingsFragment.updateUserInfo();
+	}
+
 
 }

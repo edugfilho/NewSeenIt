@@ -10,7 +10,6 @@ import org.xml.sax.SAXException;
 
 import android.app.DialogFragment;
 import android.os.AsyncTask;
-import android.webkit.WebView;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
@@ -18,6 +17,7 @@ import com.aetrion.flickr.REST;
 import com.aetrion.flickr.RequestContext;
 import com.aetrion.flickr.auth.Auth;
 import com.aetrion.flickr.auth.AuthInterface;
+import com.example.mobileseenit.MainActivity;
 
 //Code based off Example
 //https://github.com/r0man/flickrj/blob/master/examples/AuthExample.java
@@ -29,13 +29,15 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String>{
 	String token = "";
 	private String API_KEY = "af76271af34e193bd2f002eb32032e01";
 	private String SECRET = "b7b96e8ab7032484";
-	FlickrLoginDialog g;
-	DialogFragment fragment;
+	FlickrLoginDialog fragment;
 	AuthInterface a;
+	MainActivity mainActivity;
+	Auth auth;
 	
-	public FlickrTestAuthTask(DialogFragment gg, AuthInterface a) {
+	public FlickrTestAuthTask(FlickrLoginDialog gg, AuthInterface a) {
 		this.a = a;
-		fragment = gg;
+		fragment =  gg;
+		mainActivity  = (MainActivity) gg.getActivity();
 		// Setup flickrJ object
 		try {
 			f = new Flickr(API_KEY, SECRET, new REST());
@@ -71,7 +73,7 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String>{
 		        String line = infile.readLine();
 		        try {
 		        	frob = frobString[0];
-		            Auth auth = a.getToken(frob);
+		            auth = a.getToken(frob);
 		            System.out.println("Authentication success");
 		            // This token can be used until the user revokes it.
 		            System.out.println("Token: " + auth.getToken());
@@ -79,6 +81,8 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String>{
 		            System.out.println("Realname: " + auth.getUser().getRealName());
 		            System.out.println("Username: " + auth.getUser().getUsername());
 		            System.out.println("Permission: " + auth.getPermission().getType());
+		            
+		            
 		        } catch (FlickrException e) {
 		            System.out.println("Authentication failed");
 		            e.printStackTrace();
@@ -87,13 +91,22 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String>{
 		return "test";
 	}
 	
+	
+	
 
 	
 //	// onPostExecute displays the results of the AsyncTask.
 	@Override
 	protected void onPostExecute(String result) {
-	
+		  //Set stuff
+        FlickrUser newUser = new FlickrUser();
+        newUser.setUsername(auth.getUser().getUsername());
+        
+        fragment.acceptFlickrUser(newUser);
+        System.out.println();
 	}
+	
+	
 	
 
 }
