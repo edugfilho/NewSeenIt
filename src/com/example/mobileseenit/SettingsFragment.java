@@ -58,14 +58,20 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 	}
 
 	public void updateUserInfo() {
+		
 		// Check for flickr user
 		FlickrUser flickrUser = ((MainActivity) getActivity()).getFlickrUser();
+		
 		if (flickrUser != null) {
 			// Set username text
 			TextView usernameTextView = (TextView) getView().findViewById(
-					R.id.flickr_username);
+					R.id.flickr_username);		
 			usernameTextView.setText(flickrUser.getUsername());
+			
+			//Remove add button, put in Logout button
+			//TODO
 		}
+	
 	}
 
 	@Override

@@ -85,7 +85,7 @@
         android:layout_alignParentLeft="true"
         android:orientation="vertical" >
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
@@ -93,6 +93,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
                 android:text="@string/settings_flickr_label"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -100,17 +101,20 @@
                 android:id="@+id/flickr_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="dummyUsername"
+                android:layout_centerHorizontal="true"
+                android:maxLength="20"
+                android:text="@string/settings_not_logged_in"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <ImageButton
                 android:id="@+id/add_flickr_account_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:src="@android:drawable/ic_menu_add" />
-        </LinearLayout>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
@@ -118,21 +122,25 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
                 android:text="@string/settings_instagram_label"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="dummyUsername"
+                android:layout_centerHorizontal="true"
+                android:maxLength="20"
+                android:text="@string/settings_not_logged_in"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <ImageButton
                 android:id="@+id/imageButton1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
                 android:src="@android:drawable/ic_menu_add" />
-        </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 
 </RelativeLayout>

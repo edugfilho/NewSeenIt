@@ -22,5 +22,6 @@
     <string name="settings_after_label">Images After:</string>
     <string name="settings_flickr_label">Flickr:</string>
     <string name="settings_instagram_label">Instagram:</string>
+    <string name="settings_not_logged_in">Not Logged In</string>
 
 </resources>
