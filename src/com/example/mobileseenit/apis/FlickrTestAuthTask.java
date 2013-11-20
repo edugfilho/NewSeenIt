@@ -27,24 +27,19 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String>{
 	RequestContext requestContext;
 	String frob = "";
 	String token = "";
-	private String API_KEY = "af76271af34e193bd2f002eb32032e01";
-	private String SECRET = "b7b96e8ab7032484";
+	
 	FlickrLoginDialog fragment;
 	AuthInterface a;
 	MainActivity mainActivity;
 	Auth auth;
 	
 	public FlickrTestAuthTask(FlickrLoginDialog gg, AuthInterface a) {
-		this.a = a;
+		
 		fragment =  gg;
 		mainActivity  = (MainActivity) gg.getActivity();
-		// Setup flickrJ object
-		try {
-			f = new Flickr(API_KEY, SECRET, new REST());
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+		f = mainActivity.getFlickr();
+		this.a =f.getAuthInterface();
 	}
 	
 	@Override

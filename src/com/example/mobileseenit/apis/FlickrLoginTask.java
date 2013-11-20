@@ -14,38 +14,32 @@ import android.webkit.WebViewClient;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
-import com.aetrion.flickr.REST;
 import com.aetrion.flickr.RequestContext;
 import com.aetrion.flickr.auth.AuthInterface;
 import com.aetrion.flickr.auth.Permission;
+import com.example.mobileseenit.MainActivity;
 
 //Code based off Example
 //https://github.com/r0man/flickrj/blob/master/examples/AuthExample.java
 public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 
-	Flickr f;
+	Flickr flickr;
 	RequestContext requestContext;
 	String frob = "";
 	String token = "";
-	private String API_KEY = "af76271af34e193bd2f002eb32032e01";
-	private String SECRET = "b7b96e8ab7032484";
 	FlickrLoginDialog g;
 	WebView myWebView;
 
 	DialogFragment fragment;
 	AuthInterface a;
 
-	public FlickrLoginTask(WebView v, DialogFragment gg, AuthInterface a) {
+	public FlickrLoginTask(WebView v, DialogFragment gg) {
 		this.a = a;
 		fragment = gg;
 		myWebView = v;
-		// Setup flickrJ object
-		try {
-			f = new Flickr(API_KEY, SECRET, new REST());
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+		//Get flickr object from MainAcivity
+		flickr = ((MainActivity) gg.getActivity()).getFlickr();
 	}
 
 	@Override
@@ -74,7 +68,7 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 
 		Flickr.debugStream = false;
 		requestContext = RequestContext.getRequestContext();
-		a = f.getAuthInterface();
+		a = flickr.getAuthInterface();
 		try {
 			frob = a.getFrob();
 		} catch (FlickrException e) {
@@ -100,7 +94,7 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 
 			myWebView.loadUrl(result);
 			
-			((FlickrLoginDialog) fragment).updateAuth(a, frob);
+			((FlickrLoginDialog) fragment).updateFlickr(flickr, frob);
 		}
 
 	}

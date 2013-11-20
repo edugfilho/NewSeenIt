@@ -14,14 +14,17 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
+import com.aetrion.flickr.Flickr;
+import com.example.mobileseenit.apis.FlickrBuilder;
 import com.example.mobileseenit.apis.FlickrLoginDialog;
+import com.example.mobileseenit.apis.FlickrLoginDialog.OnUpdateFlickrListener;
 import com.example.mobileseenit.apis.FlickrSearchTask;
 import com.example.mobileseenit.apis.FlickrUser;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class MainActivity extends FragmentActivity implements
-		ActionBar.TabListener,
-		FlickrLoginDialog.OnFlickrLoggedInListener{
+		ActionBar.TabListener, FlickrLoginDialog.OnFlickrLoggedInListener,
+		FlickrLoginDialog.OnUpdateFlickrListener{
 
 	// View Pager
 	SectionsPagerAdapter mSectionsPagerAdapter;
@@ -29,13 +32,17 @@ public class MainActivity extends FragmentActivity implements
 
 	// Currently loaded photos
 	ArrayList<PhotoWrapper> photoList;
-	
-	//Fragments
+
+	// Fragments
 	MainFragment mainFragment;
 	SettingsFragment settingsFragment;
-	
-	//user objects
+	PhotoUploadTestFragment uploadTestFragment;
+
+	// user objects
 	FlickrUser flickrUser;
+
+	// Shared API objects
+	Flickr flickr;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +56,13 @@ public class MainActivity extends FragmentActivity implements
 		// Add your fragments here
 		mainFragment = new MainFragment();
 		settingsFragment = new SettingsFragment();
+		uploadTestFragment = new PhotoUploadTestFragment();
 		List<Fragment> fragments = new ArrayList<Fragment>();
 		fragments.add(mainFragment);
 		fragments.add(new ImageCaptureFragment());
 		fragments.add(settingsFragment);
-		
-		
+		fragments.add(uploadTestFragment);
+
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(
@@ -82,19 +90,22 @@ public class MainActivity extends FragmentActivity implements
 					.setTabListener(this));
 		}
 
-		photoList = new ArrayList<PhotoWrapper>();	
+		photoList = new ArrayList<PhotoWrapper>();
 		FlickrSearchTask flickrSearch = new FlickrSearchTask(this);
 		flickrSearch.execute();
 		mViewPager.setCurrentItem(0);
-		
+
+		// Initialize Flickr Object
+		flickr = FlickrBuilder.buildFlickr();
+
 	}
 
-	//Can be called from search methods. Adds the PhotoWrappers to
-	//the current list
+	// Can be called from search methods. Adds the PhotoWrappers to
+	// the current list
 	public void addPhotos(ArrayList<PhotoWrapper> photos) {
 
 		photoList.addAll(photos);
-		if(!mainFragment.isDetached())
+		if (!mainFragment.isDetached())
 			mainFragment.updateDisplayedPhotos();
 	}
 
@@ -122,8 +133,6 @@ public class MainActivity extends FragmentActivity implements
 	public void onTabReselected(ActionBar.Tab tab,
 			FragmentTransaction fragmentTransaction) {
 	}
-	
-	
 
 	public ArrayList<PhotoWrapper> getPhotoList() {
 		return photoList;
@@ -132,8 +141,6 @@ public class MainActivity extends FragmentActivity implements
 	public void setPhotoList(ArrayList<PhotoWrapper> photoList) {
 		this.photoList = photoList;
 	}
-
-
 
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -163,14 +170,14 @@ public class MainActivity extends FragmentActivity implements
 			// args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position +
 			// 1);
 			// fragment.setArguments(args);
-			System.out.println("position: " +position);
+			System.out.println("position: " + position);
 			return fragments.get(position);
 		}
 
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 3;
+			return 4;
 		}
 
 		@Override
@@ -185,12 +192,12 @@ public class MainActivity extends FragmentActivity implements
 				return "Capture";
 			case 2:
 				return "Settings";
+			case 3:
+				return "Upload";
 			}
 			return null;
 		}
 	}
-
-
 
 	public FlickrUser getFlickrUser() {
 		return flickrUser;
@@ -200,6 +207,14 @@ public class MainActivity extends FragmentActivity implements
 		this.flickrUser = flickrUser;
 	}
 
+	public Flickr getFlickr() {
+		return flickr;
+	}
+
+	public void setFlickr(Flickr flickr) {
+		this.flickr = flickr;
+	}
+
 	/**
 	 * Interface with FlickrLoginDialog
 	 */
@@ -207,10 +222,15 @@ public class MainActivity extends FragmentActivity implements
 	public void onFlickLoggedIn(FlickrUser u) {
 		System.out.println("FLickr User Logged in!");
 		this.flickrUser = u;
-		
-		//Update info
+
+		// Update info
 		settingsFragment.updateUserInfo();
 	}
 
+	@Override
+	public void onUpdateFlickr(Flickr f) {
+		System.out.println("Update Flickr object!");
+		this.flickr = f;
+	}
 
 }

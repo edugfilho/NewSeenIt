@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
+import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.auth.AuthInterface;
 import com.example.mobileseenit.R;
 
@@ -17,6 +18,7 @@ public class FlickrLoginDialog extends DialogFragment {
 	WebView myWeb;
 	FlickrLoginTask loginTask;
 	String frob;
+	Flickr f;
 
 	public static FlickrLoginDialog newInstance() {
 		FlickrLoginDialog f = new FlickrLoginDialog();
@@ -30,7 +32,7 @@ public class FlickrLoginDialog extends DialogFragment {
 		myWeb = (WebView) v.findViewById(R.id.flickr_login_webview);
 
 		try {
-			loginTask = new FlickrLoginTask(myWeb, this, authInterface);
+			loginTask = new FlickrLoginTask(myWeb, this);
 			loginTask.execute("login");
 
 		} catch (Exception e) {
@@ -40,8 +42,8 @@ public class FlickrLoginDialog extends DialogFragment {
 		return v;
 	}
 
-	//Called from FlickrAuth after user logs in.
-	//User is created. Send this to MainAcitity
+	// Called from FlickrAuth after user logs in.
+	// User is created. Send this to MainAcitity
 	public void acceptFlickrUser(FlickrUser user) {
 		FlickrUser uu = user;
 		System.out.println();
@@ -50,18 +52,25 @@ public class FlickrLoginDialog extends DialogFragment {
 		mCallback.onFlickLoggedIn(user);
 	}
 
-	public void updateAuth(AuthInterface a, String frob) {
+	// public void updateAuth(AuthInterface a, String frob) {
+	// this.frob = frob;
+	// this.authInterface = a;
+	// }
+	public void updateFlickr(Flickr f, String frob) {
+		this.f = f;
+
 		this.frob = frob;
-		this.authInterface = a;
+		// Update flickr object in MainActivity
+		updateFlickrCallback.onUpdateFlickr(f);
 	}
 
-	//When user closes login dialog for Flickr
+	// When user closes login dialog for Flickr
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		try {
-			
-			//Check the Auth, build a FlickrUser
+
+			// Check the Auth, build a FlickrUser
 			FlickrTestAuthTask lol = new FlickrTestAuthTask(this, authInterface);
 			lol.execute(frob);
 		} catch (Exception e) {
@@ -74,10 +83,15 @@ public class FlickrLoginDialog extends DialogFragment {
 	 * Interface to communicate with MainActivity
 	 */
 	OnFlickrLoggedInListener mCallback;
+	OnUpdateFlickrListener updateFlickrCallback;
 
 	// Container Activity must implement this interface
 	public interface OnFlickrLoggedInListener {
 		public void onFlickLoggedIn(FlickrUser user);
+	}
+
+	public interface OnUpdateFlickrListener {
+		public void onUpdateFlickr(Flickr f);
 	}
 
 	@Override
@@ -88,6 +102,7 @@ public class FlickrLoginDialog extends DialogFragment {
 		// the callback interface. If not, it throws an exception
 		try {
 			mCallback = (OnFlickrLoggedInListener) activity;
+			updateFlickrCallback = (OnUpdateFlickrListener) activity;
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
 					+ " must implement OnFlickrLoggedInListener");

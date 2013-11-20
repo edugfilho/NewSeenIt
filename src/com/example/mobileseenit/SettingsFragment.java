@@ -18,7 +18,7 @@ import com.example.mobileseenit.apis.FlickrUser;
 public class SettingsFragment extends Fragment implements OnTouchListener,
 		OnClickListener {
 
-	// The login dialog for flickr
+	// Flickr Login Dialog
 	FlickrLoginDialog flickrLoginDialog;
 
 	@Override
