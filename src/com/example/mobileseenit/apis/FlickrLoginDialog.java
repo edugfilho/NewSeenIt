@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 
 import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.auth.Auth;
 import com.aetrion.flickr.auth.AuthInterface;
 import com.example.mobileseenit.R;
 
@@ -49,13 +50,11 @@ public class FlickrLoginDialog extends DialogFragment {
 		System.out.println();
 
 		// Tell MainActivity that user is logged in on Flickr
+		//Pass it the user and the auth
 		mCallback.onFlickLoggedIn(user);
 	}
 
-	// public void updateAuth(AuthInterface a, String frob) {
-	// this.frob = frob;
-	// this.authInterface = a;
-	// }
+
 	public void updateFlickr(Flickr f, String frob) {
 		this.f = f;
 

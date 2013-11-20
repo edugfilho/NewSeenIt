@@ -15,9 +15,9 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
 import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.auth.Auth;
 import com.example.mobileseenit.apis.FlickrBuilder;
 import com.example.mobileseenit.apis.FlickrLoginDialog;
-import com.example.mobileseenit.apis.FlickrLoginDialog.OnUpdateFlickrListener;
 import com.example.mobileseenit.apis.FlickrSearchTask;
 import com.example.mobileseenit.apis.FlickrUser;
 import com.example.mobileseenit.helpers.PhotoWrapper;
@@ -43,6 +43,7 @@ public class MainActivity extends FragmentActivity implements
 
 	// Shared API objects
 	Flickr flickr;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -214,6 +215,7 @@ public class MainActivity extends FragmentActivity implements
 	public void setFlickr(Flickr flickr) {
 		this.flickr = flickr;
 	}
+	
 
 	/**
 	 * Interface with FlickrLoginDialog

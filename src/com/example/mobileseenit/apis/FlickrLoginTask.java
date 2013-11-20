@@ -75,7 +75,7 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 			e.printStackTrace();
 		}
 		System.out.println("frob: " + frob);
-		URL url = a.buildAuthenticationUrl(Permission.DELETE, frob);
+		URL url = a.buildAuthenticationUrl(Permission.WRITE, frob);
 		System.out
 				.println("Press return after you granted access at this URL:");
 		System.out.println(url.toExternalForm());
@@ -91,7 +91,6 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 			myWebView.setWebViewClient(new WebViewClient());
 			myWebView.clearCache(true);
 			myWebView.getSettings().setJavaScriptEnabled(true);
-
 			myWebView.loadUrl(result);
 			
 			((FlickrLoginDialog) fragment).updateFlickr(flickr, frob);

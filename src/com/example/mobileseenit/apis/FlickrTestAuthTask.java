@@ -68,7 +68,8 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String>{
 		        String line = infile.readLine();
 		        try {
 		        	frob = frobString[0];
-		            auth = a.getToken(frob);
+		            auth = f.getAuthInterface().getToken(frob);
+		            f.setAuth(auth);
 		            System.out.println("Authentication success");
 		            // This token can be used until the user revokes it.
 		            System.out.println("Token: " + auth.getToken());
@@ -97,6 +98,7 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String>{
         FlickrUser newUser = new FlickrUser();
         newUser.setUsername(auth.getUser().getUsername());
         
+        fragment.updateFlickr(f, "");
         fragment.acceptFlickrUser(newUser);
         System.out.println();
 	}

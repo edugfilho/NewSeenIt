@@ -1,34 +1,33 @@
 package com.example.mobileseenit.apis;
 
 import java.io.IOException;
-import java.net.URL;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import android.os.AsyncTask;
+
 import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.FlickrException;
-import com.aetrion.flickr.REST;
 import com.aetrion.flickr.RequestContext;
 import com.aetrion.flickr.auth.Permission;
-
-import android.os.AsyncTask;
+import com.aetrion.flickr.uploader.UploadMetaData;
 
 public class FlickrUploadTask extends AsyncTask<String, Void, String> {
 
 	Flickr f;
-	private String API_KEY = "af76271af34e193bd2f002eb32032e01";
-	private String SECRET = "b7b96e8ab7032484";
 
-	public FlickrUploadTask() {
-		// Setup flickrJ object
-		try {
-			f = new Flickr(API_KEY, SECRET, new REST());
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	byte data[] ;
+	UploadMetaData meta;
+	RequestContext requestContext;
+
+	
+	public FlickrUploadTask(Flickr flickrObject, byte data[], UploadMetaData m) {
+
+		
+		this.data = data;
+		this.meta = m;
+		this.f = flickrObject;
 	}
 
 	@Override
@@ -51,6 +50,16 @@ public class FlickrUploadTask extends AsyncTask<String, Void, String> {
 
 	public String upload(String... searchTerms) throws IOException,
 			SAXException, ParserConfigurationException {
+		
+		requestContext = RequestContext.getRequestContext();
+		requestContext.setAuth(f.getAuth());
+
+		try {
+			f.getAuth().setPermission(Permission.WRITE);
+			f.getUploader().upload(data, meta);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	
 
