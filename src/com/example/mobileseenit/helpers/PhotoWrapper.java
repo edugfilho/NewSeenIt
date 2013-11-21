@@ -57,6 +57,7 @@ public class PhotoWrapper {
 		return details;
 	}
 
+	//Access Methods
 	public Bitmap getBitmap() {
 		return bitmap;
 	}
@@ -72,7 +73,5 @@ public class PhotoWrapper {
 	public void setDetailMap(HashMap<String, String> detailMap) {
 		this.detailMap = detailMap;
 	}
-
-	// Getters and setter
 
 }

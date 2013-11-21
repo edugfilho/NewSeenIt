@@ -5,30 +5,39 @@ import com.example.mobileseenit.MainActivity;
 
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.Intent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.EditText;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 
 /**
- * Custom class to centralize imageview style and creation.
- *
+ * Custom class to centralize ImageView style and creation.
+ * Imageviews are used to display the photos returned 
+ * from the APIs.
+ * @author dylanrunkel
  */
 public class PhotoStreamImageView extends ImageView implements OnClickListener {
 
 	//Style Properties
-	int marginBottom = 20;
-	int marginTop = 20;
-	int marginLeft = 0;
-	int marginRight = 0;
-	float width = 280; //in dp!
+	private int marginBottom = 20;
+	private int marginTop = 20;
+	private int marginLeft = 0;
+	private int marginRight = 0;
+	private float width = 280; //in dp!
 	
-	PhotoWrapper pWrapper;
+	//Contains a PhotoWrapper that contains
+	//the photo bitmap and metadeta
+	private PhotoWrapper pWrapper;
 
 	
+	/**
+	 * Constructor to build the ImageView. Sets the style
+	 * info defined above.
+	 * @param context
+	 * @param p
+	 */
 	public PhotoStreamImageView(Context context, PhotoWrapper p) {
 		super(context);
 		
@@ -37,7 +46,7 @@ public class PhotoStreamImageView extends ImageView implements OnClickListener {
 		pWrapper = p;
 		
 		//set margins
-		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		lp.setMargins(marginLeft, marginTop, marginRight, marginBottom);
 		
 		//Width
@@ -46,13 +55,13 @@ public class PhotoStreamImageView extends ImageView implements OnClickListener {
 		//Add action so user can click image and
 		//load image details activity
 		setClickable(true);
-		setOnClickListener((OnClickListener) this);
+		setOnClickListener(this);
 		
 		setLayoutParams(lp);		
 	}
 	
 	
-	
+	//Helper method to convert dp to pixels.
 	private int dpToPixel(float dp)
 	{
 		final float scale = getContext().getResources().getDisplayMetrics().density;
@@ -65,8 +74,7 @@ public class PhotoStreamImageView extends ImageView implements OnClickListener {
 	//User can click the picture to bring up the image details.
 	@Override
 	public void onClick(View v) {
-		System.out.println("clicked" +this.pWrapper.getDetailMap().get(PhotoWrapper.TITLE_FIELD));
-		
+		//TODO Log.
 		FragmentTransaction ft = ((MainActivity)getContext()).getFragmentManager()
 				.beginTransaction();
 		ImageDialogSeenIt newFragment = ImageDialogSeenIt.newInstance(this.pWrapper);

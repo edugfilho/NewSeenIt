@@ -27,14 +27,12 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 	RequestContext requestContext;
 	String frob = "";
 	String token = "";
-	FlickrLoginDialog g;
 	WebView myWebView;
 
 	DialogFragment fragment;
 	AuthInterface a;
 
 	public FlickrLoginTask(WebView v, DialogFragment gg) {
-		this.a = a;
 		fragment = gg;
 		myWebView = v;
 	
@@ -74,7 +72,6 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 		} catch (FlickrException e) {
 			e.printStackTrace();
 		}
-		System.out.println("frob: " + frob);
 		URL url = a.buildAuthenticationUrl(Permission.WRITE, frob);
 		System.out
 				.println("Press return after you granted access at this URL:");
@@ -83,7 +80,10 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 		return url.toExternalForm();
 	}
 
-	// // onPostExecute displays the results of the AsyncTask.
+	/**
+	 * After execute, dsplay the flickr login page.
+	 * The user should close this after completion.
+	 */
 	@Override
 	protected void onPostExecute(String result) {
 		if (result.contains("http")) {
