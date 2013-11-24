@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -47,6 +49,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	Bitmap mBitmap; 
 	FocusManager mFManager;
 	PreviewLayout preLayout;
+	CameraLocationManager mLocationManager;
 	Parameters para = null;
 	int type;
 	int state;
@@ -80,7 +83,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		holder.addCallback(this);
 		preLayout = (PreviewLayout)getView().findViewById(R.id.CameraLayout);
 		mSurface.setOnTouchListener(this);
-		
+		mLocationManager = new CameraLocationManager(this.getActivity());		
 	}
 
 
@@ -89,6 +92,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		super.onPause();
 		Log.d("on pause", "onPause() gets called");
+		mLocationManager.stopRecordLocations();
 		this.stopPreview();
 		if (mCamera != null){
             //mCamera.setPreviewCallback(null);
@@ -108,6 +112,7 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 
 		Log.d("on resume", "onResume() gets called");
 		super.onResume();
+		mLocationManager.startRecordLocations();
 		holder = mSurface.getHolder();
 		holder.addCallback(this);
 		holder.setKeepScreenOn(true);
@@ -283,7 +288,25 @@ protected void stopPreview(){
     @Override
 	public void capture() {
 		// TODO Auto-generated method stub
-    	mCamera.takePicture(null, null, new myPictureCallback());
+    	Location loc = mLocationManager.getLocation();
+    	Log.i("long", "long: "+ loc.getLongitude());
+    	Log.i("lat", "lat: "+ loc.getLatitude());
+    	para.removeGpsData();
+    	para.setGpsTimestamp(System.currentTimeMillis()/1000);
+    	if(loc!=null){
+    		para.setGpsLatitude(loc.getLatitude());
+    		para.setGpsLongitude(loc.getLongitude());
+    		para.setGpsProcessingMethod(loc.getProvider().toUpperCase(Locale.getDefault()));
+    		if(loc.hasAltitude())
+    			para.setGpsAltitude(loc.getAltitude());
+    		else
+    			para.setGpsAltitude(0);
+    		if(loc.getTime()!=0){
+    			para.setGpsTimestamp(loc.getTime()/1000);
+    		}
+    	}
+    	
+    	mCamera.takePicture(null, null, new myPictureCallback(loc));
     	type = default_focus;
 	}
     
@@ -344,7 +367,11 @@ protected void stopPreview(){
     	
     }
     private final class myPictureCallback implements PictureCallback{
-
+    	
+    	Location mLoc;
+    	public myPictureCallback(Location loc) {
+    		mLoc = loc;
+    	}
     	@Override
     	public void onPictureTaken(byte[] data, Camera camera) {
     		// TODO Auto-generated method stub
