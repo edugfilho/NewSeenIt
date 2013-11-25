@@ -4,19 +4,22 @@
     android:layout_height="fill_parent"
     android:minHeight="1000dp"
     android:minWidth="1000dp"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:background="@color/background_colour">
 
     <ImageView
         android:id="@+id/imageDialog"
         android:layout_width="match_parent"
         android:layout_height="352dp"
-        android:src="@drawable/focus" />
+        android:src="@drawable/focus"
+    	android:background="@color/white"/>
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp" >
+        android:padding="10dp"
+    	android:background="@color/white" >
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -26,7 +29,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/photo_title_label" />
+                android:text="@string/photo_title_label"
+                android:textStyle="bold"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/photo_title"
@@ -42,7 +47,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/photo_link_label" />
+                android:text="@string/photo_link_label"
+                android:textStyle="bold"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/photo_link"
