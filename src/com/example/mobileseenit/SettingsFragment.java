@@ -11,6 +11,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Spinner;
 
 import com.example.mobileseenit.apis.FlickrLoginDialog;
 import com.example.mobileseenit.apis.FlickrUser;
@@ -21,6 +22,9 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 	// Flickr Login Dialog
 	FlickrLoginDialog flickrLoginDialog;
 
+	//SPinner for Search Diameter
+	public Spinner searchDiameter;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -39,6 +43,9 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 					.findViewById(R.id.flickr_username);
 			usernameTextView.setText(flickrUser.getUsername());
 		}
+		
+		//Set the Search Diameter Spinner
+		searchDiameter = (Spinner)v.findViewById(R.id.spinner1);
 
 		return v;
 	}
