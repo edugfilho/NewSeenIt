@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.mobileseenit.SeenItLocation.LocationResult;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewCallback;
@@ -35,14 +36,13 @@ import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 public class InstagramFragment extends Fragment implements OnTouchListener,
 		OnClickListener {
 
-	private String stringTestText = "what?";
-
 	private LocationManager locationManager;
 	private String provider;
 	public Double lat;
 	public Double lng;
 	TreeMap<String, String> imgUrlDistance;
 	ImageView selectedImage;
+	// Location prevLocation;
 
 	private ListView listView;
 	private InstagramAdapter instaAdapter;
@@ -55,28 +55,32 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 			//
 			lat = location.getLatitude();
 			lng = location.getLongitude();
-			/*String[] params = { SEARCH_URL,
+
+			String[] params = { SEARCH_URL,
 					"client_id=" + getString(R.string.insta_client_id),
 					"&lat=" + location.getLatitude(),
 					"&lng=" + location.getLongitude(), "&distance=" + "1000" };
 			try {
 				imgUrlDistance = new InstagramRequest().execute(params).get();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
+
 				e.printStackTrace();
-			}*/
+			}
+
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-				/*	for (TreeMap.Entry<String, String> entry : imgUrlDistance
+
+					for (TreeMap.Entry<String, String> entry : imgUrlDistance
 							.entrySet()) {
 						instaAdapter.add(entry.getValue());
-					}*/
-					setText("Location: lat: " + lat + " lng: "
-							+ lng);
+					}
+
+					//setText("Location: lat: " + lat + " lng: " + lng);
+					Toast.makeText(getActivity(), "Location acquired",
+							Toast.LENGTH_SHORT).show();
 				}
 			});
 
@@ -86,7 +90,6 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		// loc = new SeenItLocation();
 		View rootView = inflater.inflate(R.layout.fragment_instagram,
 				container, false);
 
@@ -98,9 +101,34 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 		GridAdapter a = new GridAdapter(instaAdapter);
 		listView.setAdapter(a);
 		instaAdapter.clear();
-		
 
 		return rootView;
+	}
+
+	@Override
+	public void onPause() {
+		loc.getLocationManager().removeUpdates(loc.locationListenerGps);
+		super.onPause();
+	}
+
+	@Override
+	public void onStop() {
+		loc.getLocationManager().removeUpdates(loc.locationListenerGps);
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+		if (loc.gps_enabled) {
+			loc.getLocationManager().requestLocationUpdates(
+					LocationManager.GPS_PROVIDER,
+					loc.getUpdateIntervalTimeMilisec(), 1000,
+					loc.locationListenerGps);
+			Toast.makeText(getActivity(), "Getting location...",
+					Toast.LENGTH_SHORT).show();
+
+		}
+		super.onResume();
 	}
 
 	@Override

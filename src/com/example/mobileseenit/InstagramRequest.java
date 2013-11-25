@@ -17,7 +17,8 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class InstagramRequest extends AsyncTask<String, Integer, TreeMap<String, String>> {
+public class InstagramRequest extends
+		AsyncTask<String, Integer, TreeMap<String, String>> {
 
 	private static final String AUTHURL = "https://api.instagram.com/oauth/authorize/";
 	private static final String TOKENURL = "https://api.instagram.com/oauth/access_token";
@@ -28,7 +29,7 @@ public class InstagramRequest extends AsyncTask<String, Integer, TreeMap<String,
 	@Override
 	protected TreeMap<String, String> doInBackground(String... params) {
 		// String request = SEARCH_URL +
-		String parameters = params[1]+params[2]+params[3]+params[4];
+		String parameters = params[1] + params[2] + params[3] + params[4];
 		JSONArray dataArray = null;
 		imgUrlDistance = new TreeMap<String, String>();
 		try {
@@ -55,26 +56,25 @@ public class InstagramRequest extends AsyncTask<String, Integer, TreeMap<String,
 			in.close();
 
 			Log.e("USER Response", response.toString());
-			JSONObject jsonObject = (JSONObject) new JSONObject(response.toString());
+			JSONObject jsonObject = (JSONObject) new JSONObject(
+					response.toString());
 			Log.e("USER Response", jsonObject.toString());
 			dataArray = jsonObject.getJSONArray("data");
-			
-			
+
 			String id;
 			String imgUrl;
-			for(int i=0; i < dataArray.length(); i++){
-				
-				//Is it a picture? Throw it in the map.
-				if(dataArray.getJSONObject(i).get("type").toString().compareTo("image") == 0){
+			for (int i = 0; i < dataArray.length(); i++) {
+
+				// Is it a picture? Throw it in the map.
+				if (dataArray.getJSONObject(i).get("type").toString()
+						.compareTo("image") == 0) {
 					id = dataArray.getJSONObject(i).getString("id");
 					imgUrl = dataArray.getJSONObject(i).getJSONObject("images")
-							.getJSONObject("standard_resolution").get("url").toString();
+							.getJSONObject("standard_resolution").get("url")
+							.toString();
 					imgUrlDistance.put(id, imgUrl);
 				}
 			}
-			
-			/* String[] imageNames = array.get.; */
-			System.out.println("debugging purp");
 
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
