@@ -8,10 +8,7 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -32,13 +29,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mobileseenit.SeenItLocation.LocationResult;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewCallback;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 public class InstagramFragment extends Fragment implements OnTouchListener,
-		OnClickListener, LocationListener {
-
-	private String stringTestText = "what?";
+		OnClickListener {
 
 	private LocationManager locationManager;
 	private String provider;
@@ -46,77 +42,93 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 	public Double lng;
 	TreeMap<String, String> imgUrlDistance;
 	ImageView selectedImage;
+	// Location prevLocation;
 
 	private ListView listView;
 	private InstagramAdapter instaAdapter;
 
+	private SeenItLocation loc;
 	private static final String SEARCH_URL = "https://api.instagram.com/v1/media/search";
+	LocationResult locationResult = new LocationResult() {
+		@Override
+		public void gotLocation(Location location) {
+			//
+			lat = location.getLatitude();
+			lng = location.getLongitude();
+
+			String[] params = { SEARCH_URL,
+					"client_id=" + getString(R.string.insta_client_id),
+					"&lat=" + location.getLatitude(),
+					"&lng=" + location.getLongitude(), "&distance=" + "1000" };
+			try {
+				imgUrlDistance = new InstagramRequest().execute(params).get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+
+				e.printStackTrace();
+			}
+
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+
+					for (TreeMap.Entry<String, String> entry : imgUrlDistance
+							.entrySet()) {
+						instaAdapter.add(entry.getValue());
+					}
+
+					//setText("Location: lat: " + lat + " lng: " + lng);
+					Toast.makeText(getActivity(), "Location acquired",
+							Toast.LENGTH_SHORT).show();
+				}
+			});
+
+		}
+	};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-
 		View rootView = inflater.inflate(R.layout.fragment_instagram,
 				container, false);
 
-		if (setGpsCoord()) {
+		loc = new SeenItLocation();
+		loc.getLocation(this.getActivity(), locationResult);
 
-			String[] params = { SEARCH_URL,
-					"client_id=" + getString(R.string.insta_client_id),
-					"&lat=" + lat.toString(), "&lng=" + lng.toString(),
-					"&distance=" + "1000" };
-			try {
-				imgUrlDistance = new InstagramRequest().execute(params).get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		} else {
-			setText("Location not found");
-		}
 		listView = (ListView) rootView.findViewById(R.id.results);
 		instaAdapter = new InstagramAdapter(getActivity());
 		GridAdapter a = new GridAdapter(instaAdapter);
 		listView.setAdapter(a);
 		instaAdapter.clear();
 
-		getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				for (TreeMap.Entry<String, String> entry : imgUrlDistance
-						.entrySet()) {
-					instaAdapter.add(entry.getValue());
-				}
-			}
-		});
-
 		return rootView;
 	}
 
-	public boolean setGpsCoord() {
+	@Override
+	public void onPause() {
+		loc.getLocationManager().removeUpdates(loc.locationListenerGps);
+		super.onPause();
+	}
 
-		// Get the location manager
-		locationManager = (LocationManager) getActivity().getSystemService(
-				Context.LOCATION_SERVICE);
-		// Define the criteria how to select the locatio in provider -> use
-		// default
-		Criteria criteria = new Criteria();
-		provider = locationManager.getBestProvider(criteria, false);
+	@Override
+	public void onStop() {
+		loc.getLocationManager().removeUpdates(loc.locationListenerGps);
+		super.onPause();
+	}
 
-		// Provider should come in place of "gps" but getBestProvider always
-		// chooses Network and location ends up null, so I'll let "gps" there
-		// until I know what's going on
-		Location location = locationManager.getLastKnownLocation("gps");
-		if (location != null) {
-			System.out.println("Provider " + provider + " has been selected.");
-			onLocationChanged(location);
-			return true;
+	@Override
+	public void onResume() {
+		if (loc.gps_enabled) {
+			loc.getLocationManager().requestLocationUpdates(
+					LocationManager.GPS_PROVIDER,
+					loc.getUpdateIntervalTimeMilisec(), 1000,
+					loc.locationListenerGps);
+			Toast.makeText(getActivity(), "Getting location...",
+					Toast.LENGTH_SHORT).show();
+
 		}
-		return false;
+		super.onResume();
 	}
 
 	@Override
@@ -129,43 +141,6 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub\
 		return false;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		locationManager.requestLocationUpdates(provider, 400, 1, this);
-	}
-
-	/* Remove the locationlistener updates when Activity is paused */
-	@Override
-	public void onPause() {
-		super.onPause();
-		locationManager.removeUpdates(this);
-	}
-
-	@Override
-	public void onLocationChanged(Location location) {
-		lat = (location.getLatitude());
-		lng = (location.getLongitude());
-	}
-
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void onProviderEnabled(String provider) {
-		// Toast.makeText(this, "Enabled new provider " + provider,
-		// Toast.LENGTH_SHORT).show();
-	}
-
-	@Override
-	public void onProviderDisabled(String provider) {
-		// Toast.makeText(this, "Disabled provider " + provider,
-		// Toast.LENGTH_SHORT).show();
 	}
 
 	public void setText(String s) {
@@ -236,7 +211,7 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 						@Override
 						public void onClick(View v) {
 							showDialog(v);
-							
+
 						}
 
 					});
@@ -249,20 +224,27 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 		}
 
 		void showDialog(View v) {
-			/*Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(),
-					Bitmap.Config.ARGB_8888);
-			BitmapDrawable d = new BitmapDrawable(getResources(), b);
-			
-			String stuff = Integer.toString(v.getWidth())
-					+ Integer.toString(v.getHeight());
-
-			Toast.makeText(getActivity(), stuff, Toast.LENGTH_SHORT).show();*/
+			/*
+			 * Bitmap b = Bitmap.createBitmap(v.getWidth(), v.getHeight(),
+			 * Bitmap.Config.ARGB_8888); BitmapDrawable d = new
+			 * BitmapDrawable(getResources(), b);
+			 * 
+			 * String stuff = Integer.toString(v.getWidth()) +
+			 * Integer.toString(v.getHeight());
+			 * 
+			 * Toast.makeText(getActivity(), stuff, Toast.LENGTH_SHORT).show();
+			 */
 			Integer position = (Integer) v.getTag();
 			String imgUrl = (String) mAdapter.getItem(position);
 			FragmentTransaction ft = getActivity().getFragmentManager()
 					.beginTransaction();
-		//	ImageDialogSeenIt newFragment = ImageDialogSeenIt.newInstance(imgUrl);
 
+			/*TODO ?
+			 * ImageDialogSeenIt newFragment = ImageDialogSeenIt
+					.newInstance(imgUrl);
+
+		//	ImageDialogSeenIt newFragment = ImageDialogSeenIt.newInstance(imgUrl);
+*/
 			//newFragment.show(ft, "dialog");
 		}
 
