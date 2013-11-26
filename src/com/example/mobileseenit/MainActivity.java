@@ -37,6 +37,7 @@ public class MainActivity extends FragmentActivity implements
 	MainFragment mainFragment;
 	SettingsFragment settingsFragment;
 	PhotoUploadTestFragment uploadTestFragment;
+	InstagramFragment instagramFragment;
 
 	// user objects
 	FlickrUser flickrUser;
@@ -58,11 +59,13 @@ public class MainActivity extends FragmentActivity implements
 		mainFragment = new MainFragment();
 		settingsFragment = new SettingsFragment();
 		uploadTestFragment = new PhotoUploadTestFragment();
+		instagramFragment = new InstagramFragment();
 		List<Fragment> fragments = new ArrayList<Fragment>();
 		fragments.add(mainFragment);
 		fragments.add(new ImageCaptureFragment());
 		fragments.add(settingsFragment);
 		fragments.add(uploadTestFragment);
+		fragments.add(instagramFragment);
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
@@ -195,6 +198,8 @@ public class MainActivity extends FragmentActivity implements
 				return "Settings";
 			case 3:
 				return "Upload";
+			case 4:
+				return "InstaTest";
 			}
 			return null;
 		}
