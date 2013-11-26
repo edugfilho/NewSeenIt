@@ -7,7 +7,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -31,26 +33,36 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 public class ImageCaptureFragment extends Fragment implements OnTouchListener, FocusManager.Callback, OnClickListener,Camera.AutoFocusCallback, SurfaceHolder.Callback{
 	final int tab_to_focus = 0;
 	final int default_focus = 1;
+	final int busy = 0;
+	final int idle = 1;
 	SurfaceView mSurface;
 	SurfaceHolder holder;
 	ImageButton mButton;
+	ImageView flashIndicator;
 	Camera mCamera;
 	Focus focus;
 	Bitmap mBitmap; 
 	FocusManager mFManager;
 	PreviewLayout preLayout;
-	Parameters para;
+	CameraLocationManager mLocationManager;
+	Parameters para = null;
 	int type;
+	int state;
+	
+	boolean previewIsRunning;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		//getActivity().requestWindowFeature(Window.FEATURE_NO_TITLE);
 		//getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		state = idle;
+		type = default_focus;
 		View rootView = inflater.inflate(R.layout.fragment_image_capture,
 				container, false);
 		return rootView;
@@ -61,15 +73,17 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 		mSurface = (SurfaceView)getView().findViewById(R.id.mySurface);	
-		mSurface = (SurfaceView)getView().findViewById(R.id.mySurface);	
+		flashIndicator = (ImageView)getView().findViewById(R.id.flashIndicator);
+		flashIndicator.setOnTouchListener(new flashIndicatorOntouchListener());
 		mButton = (ImageButton)getView().findViewById(R.id.myBtn);
 		mButton.setOnClickListener(this);
-		holder = mSurface.getHolder();
-		holder.addCallback(this);
 		focus = (Focus)getView().findViewById(R.id.focus);
 		focus.showFocus();
+		holder = mSurface.getHolder();
+		holder.addCallback(this);
 		preLayout = (PreviewLayout)getView().findViewById(R.id.CameraLayout);
 		mSurface.setOnTouchListener(this);
+		mLocationManager = new CameraLocationManager(this.getActivity());		
 	}
 
 
@@ -78,9 +92,14 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		super.onPause();
 		Log.d("on pause", "onPause() gets called");
+		mLocationManager.stopRecordLocations();
+		this.stopPreview();
 		if (mCamera != null){
             //mCamera.setPreviewCallback(null);
+			focus.showFocus();
+			type = default_focus;
            	holder.removeCallback(this);
+           	holder=null;
             mCamera.release();
             mCamera = null;
         }
@@ -90,23 +109,42 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	@Override
 	public void onResume() {
 		// TODO Auto-generated method stub
-		super.onResume();
+
 		Log.d("on resume", "onResume() gets called");
+		super.onResume();
+		mLocationManager.startRecordLocations();
 		holder = mSurface.getHolder();
 		holder.addCallback(this);
-		
+		holder.setKeepScreenOn(true);
+		if(mCamera==null){
+			mCamera = Camera.open();
+			try {
+				mCamera.setPreviewDisplay(holder);
+				if(para!=null){
+					this.setUpCamera();
+					this.startPreview();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
 	}
 
 
 	@Override
 	public void onClick(View arg0) {
-		if(type == tab_to_focus)
-			capture();
-		else{
-			type = default_focus;
-			mCamera.autoFocus(this); 
-		}
-     
+		Log.d("type", "type is: "+type);
+		Log.d("state", "state is: "+state);
+		if(state == idle){
+			state = busy;
+			if(type == tab_to_focus)
+				capture();
+			else{
+				type = default_focus;
+				mCamera.autoFocus(this); 
+			}
+		} 
 	}
 	
 	@Override
@@ -114,75 +152,101 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		// TODO Auto-generated method stub
 		if(mCamera.getParameters().getMaxNumFocusAreas()<=0)
 			return false;
-		return mFManager.onTouch(mSurface.getWidth(),mSurface.getHeight(),me);
+		if(state == idle){
+			state = busy;
+			return mFManager.onTouch(mSurface.getWidth(),mSurface.getHeight(),me);
+		}
+		else
+			return false;
+	}
+	protected void setUpCamera(){
+		para = mCamera.getParameters();
+		String flashmode = para.getFlashMode();
+		updateFlashIndicator(flashmode);
+		mCamera.setDisplayOrientation(90);
+		para.setPictureFormat(ImageFormat.JPEG);
+		para.setFocusMode("auto");
+		Camera.Size picSize = getPicSize(para);
+		para.setPictureSize(picSize.width, picSize.height);
+		//Camera.Size picSize = para.getPictureSize();
+		double nRatio = (double)picSize.width/picSize.height;
+		preLayout.setRatio(nRatio);
+		Log.i("pic size: ", "width:" + picSize.width + "height:" + picSize.height + "ratio: " + nRatio);
+		Camera.Size preSize = getPreSize(para, nRatio);
+		para.setPreviewSize(preSize.width, preSize.height);
+		
+		mCamera.setParameters(para);
+		mFManager = new FocusManager(para,focus,this);
+		Log.i("My best presize: ", "width:" + preSize.width + " height: " + preSize.height);
 	}
 	
 	@Override
 	public void surfaceChanged(SurfaceHolder arg0, int arg1, int width, int height) {
 		// TODO Auto-generated method stub
 		
-		para = mCamera.getParameters();
-		mCamera.setDisplayOrientation(90);
-		para.setPictureFormat(ImageFormat.JPEG);
-		para.setFocusMode("auto");
-		Camera.Size picSize = para.getPictureSize();
-		double nRatio = (double)picSize.width/picSize.height;
-		preLayout.setRatio(nRatio);
-		Log.i("pic size: ", "width:" + picSize.width + "height:" + picSize.height + "ratio: " + nRatio);
-		Camera.Size preSize = getPreSize(para);
-		para.setPreviewSize(preSize.height, preSize.width);
-		/*
-		 * These cannot work on my Samsung device.
-		 * You guys can try on yours.
-		 * 
-		 * Camera.Size picSize = getPicSize(para);
-		 * para.setPictureSize(picSize.height, picSize.width);
-		*/
-		
-		//mCamera.setParameters(para);
-		mFManager = new FocusManager(para,focus,this);
-		mCamera.startPreview();
+		if(para==null)
+			this.setUpCamera();
+		this.startPreview();
 
-		Log.i("My best presize: ", "width:" + preSize.height + " height: " + preSize.width);
+		
 	}
 	@Override
 	public void surfaceCreated(SurfaceHolder arg0) {
 		// TODO Auto-generated method stub
-		if(mCamera==null){
+		Log.d("surfaceCreated: ","surfaceCreated");
+		if(mCamera==null)
 			mCamera = Camera.open();
-			try{
-				mCamera.setPreviewDisplay(arg0);
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-		}
+		try{
+			mCamera.setPreviewDisplay(arg0);
+		}catch(IOException e){
+			e.printStackTrace();
+		}	
 	}
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
 		// TODO Auto-generated method stub
+		Log.d("surfaceDestroyed", "surfaceDestroyed");
 		focus.showFocus();
-		mCamera.stopPreview();
-		mCamera.setPreviewCallback(null);
+		type = default_focus;
+		this.stopPreview();
+		holder.removeCallback(this);
+       	holder=null;
 		mCamera.release();
 		mCamera = null;
 	}
 	
+	
+	protected void startPreview(){
+		
+		if(!previewIsRunning&&(mCamera!=null)){
+			mCamera.startPreview();
+			previewIsRunning = true;
+		}
+	}
+protected void stopPreview(){
+		
+		if(previewIsRunning&&(mCamera!=null)){
+			mCamera.stopPreview();
+			previewIsRunning = false;
+		}
+	}
+	
 	@Override
 	public void onAutoFocus(boolean success, Camera camera) {
-		// TODO Auto-generated method stub
-		List<Area> areas = para.getFocusAreas();
-    	int left = areas.get(0).rect.left;
-    	Log.d("left:", "left" + left);
+		// TODO Auto-generated method stub	
+		if(type == tab_to_focus)
+			state = idle;
 		mFManager.onAutoFocus(success, type);
+		
 		//mFManager.updateFocus();
 	}
 	
 	
     
-    private Camera.Size getPreSize(Camera.Parameters para){
+    private Camera.Size getPreSize(Camera.Parameters para, double nRatio){
     	
     	List<Camera.Size> previewSizes = para.getSupportedPreviewSizes();
-    	Camera.Size optimal = getOptimal(previewSizes, 4.0 / 3.0);
+    	Camera.Size optimal = getOptimal(previewSizes, nRatio);
     	if(optimal == null){
     		optimal = previewSizes.get(0);
         	for(int i=0; i<previewSizes.size();i++){
@@ -224,7 +288,25 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
     @Override
 	public void capture() {
 		// TODO Auto-generated method stub
-    	mCamera.takePicture(null, null, new myPictureCallback());
+    	Location loc = mLocationManager.getLocation();
+    	Log.i("long", "long: "+ loc.getLongitude());
+    	Log.i("lat", "lat: "+ loc.getLatitude());
+    	para.removeGpsData();
+    	para.setGpsTimestamp(System.currentTimeMillis()/1000);
+    	if(loc!=null){
+    		para.setGpsLatitude(loc.getLatitude());
+    		para.setGpsLongitude(loc.getLongitude());
+    		para.setGpsProcessingMethod(loc.getProvider().toUpperCase(Locale.getDefault()));
+    		if(loc.hasAltitude())
+    			para.setGpsAltitude(loc.getAltitude());
+    		else
+    			para.setGpsAltitude(0);
+    		if(loc.getTime()!=0){
+    			para.setGpsTimestamp(loc.getTime()/1000);
+    		}
+    	}
+    	
+    	mCamera.takePicture(null, null, new myPictureCallback(loc));
     	type = default_focus;
 	}
     
@@ -234,11 +316,21 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 		para.setFocusAreas(focusArea);
 		if(para.getMaxNumMeteringAreas()>0)
 			para.setMeteringAreas(meteringArea);
+		mCamera.setParameters(para);
 	}
-
-    /*
-     * cannot work on my device.
-     * 
+    
+    public void updateFlashIndicator(String flashmode){
+//    	if(flashmode.equals(Parameters.FLASH_MODE_AUTO)){
+//			flashIndicator.setImageResource(R.drawable.flash_auto);
+//		}
+//		else if(flashmode.equals(Parameters.FLASH_MODE_OFF)){
+//			flashIndicator.setImageResource(R.drawable.flash_off);
+//		}
+//		else if(flashmode.equals(Parameters.FLASH_MODE_ON)){
+//			flashIndicator.setImageResource(R.drawable.flash_on);
+//		}
+    }
+    
     private Camera.Size getPicSize(Camera.Parameters para){
     	
     	Camera.Size myPicSize;
@@ -251,14 +343,41 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
     	}
 		return myPicSize; 	
     }
-    */
+    
+    private final class flashIndicatorOntouchListener implements OnTouchListener{
 
+		@Override
+		public boolean onTouch(View view, MotionEvent me) {
+			// TODO Auto-generated method stub
+//			if(para.getFlashMode().equals(Parameters.FLASH_MODE_AUTO)){
+//				updateFlashIndicator(Parameters.FLASH_MODE_OFF);
+//				para.setFlashMode(Parameters.FLASH_MODE_OFF);		
+//			}
+//			else if(para.getFlashMode().equals(Parameters.FLASH_MODE_OFF)){
+//				updateFlashIndicator(Parameters.FLASH_MODE_ON);
+//				para.setFlashMode(Parameters.FLASH_MODE_ON);		
+//			}
+//			else if(para.getFlashMode().equals(Parameters.FLASH_MODE_ON)){
+//				updateFlashIndicator(Parameters.FLASH_MODE_AUTO);
+//				para.setFlashMode(Parameters.FLASH_MODE_AUTO);		
+//			}
+//			mCamera.setParameters(para);
+			return true;
+		}
+    	
+    }
     private final class myPictureCallback implements PictureCallback{
-
+    	
+    	Location mLoc;
+    	public myPictureCallback(Location loc) {
+    		mLoc = loc;
+    	}
     	@Override
     	public void onPictureTaken(byte[] data, Camera camera) {
     		// TODO Auto-generated method stub
-    		mBitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+    		BitmapFactory.Options opt = new BitmapFactory.Options();
+    		opt.inSampleSize = 4;
+    		mBitmap = BitmapFactory.decodeByteArray(data, 0, data.length,opt);
             Bitmap modifiedbMap;
             int orientation;
             if(mBitmap.getHeight()<mBitmap.getWidth()){
@@ -298,7 +417,10 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
             } catch(IOException e){
             	e.printStackTrace();
             }
+            if(state==busy)
+            	state = idle;
     	}    	
     }
 
 }
+

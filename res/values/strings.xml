@@ -10,8 +10,28 @@
     <string name="hello_world">Hello world!</string>
     <string name="insta_client_id">de00d8bc08c2444a85734aa64cc2dd28</string>
     <string name="insta_client_secret">061e6fc2c15845e89e8daf10ed046852</string>
-	<string name="instagram_id">eaae27bb723146f2817f91483e21cd23</string>
+    <string name="instagram_id">eaae27bb723146f2817f91483e21cd23</string>
     <string name="instagram_secret">71feae5ed7e94ababc7fe5d27555feee</string>
-	<string name="callbackurl">http://varundroid.blog.com</string>
+    <string name="callbackurl">http://varundroid.blog.com</string>
+    <string name="image_capture_flash">flash</string>
+    <string name="title_activity_image_details">ImageDetailsActivity</string>
+    <string name="photo_title_label">Title:</string>
+    <string name="photo_link_label">Link:</string>
+    <string name="settings_image_diameter_label">Search Diameter:</string>
+    <string name="settings_before_label">Images Before:</string>
+    <string name="settings_after_label">Images After:</string>
+    <string name="settings_flickr_label">Flickr:</string>
+    <string name="settings_instagram_label">Instagram:</string>
+    <string name="settings_not_logged_in">Not Logged In</string>
+    <string-array name="SearchDiameters">
+        <item>5 meters</item>
+        <item>10 meters</item>
+        <item>15 meters</item>
+        <item>20 meters</item>
+        <item>25 meters</item>
+    </string-array>
     
+    <color name="background_colour">#6D89D5</color>
+    <color name="white">#FFFFFF</color>
+
 </resources>

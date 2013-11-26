@@ -238,10 +238,14 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 			String imgUrl = (String) mAdapter.getItem(position);
 			FragmentTransaction ft = getActivity().getFragmentManager()
 					.beginTransaction();
-			ImageDialogSeenIt newFragment = ImageDialogSeenIt
+
+			/*TODO ?
+			 * ImageDialogSeenIt newFragment = ImageDialogSeenIt
 					.newInstance(imgUrl);
 
-			newFragment.show(ft, "dialog");
+		//	ImageDialogSeenIt newFragment = ImageDialogSeenIt.newInstance(imgUrl);
+*/
+			//newFragment.show(ft, "dialog");
 		}
 
 		private class Row extends ArrayList {
