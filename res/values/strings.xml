@@ -14,6 +14,8 @@
     <string name="instagram_secret">71feae5ed7e94ababc7fe5d27555feee</string>
     <string name="callbackurl">http://varundroid.blog.com</string>
     <string name="image_capture_flash">flash</string>
+    <string name="image_upload_retake">Retake</string>
+    <string name="image_upload_upload">Upload</string>
     <string name="title_activity_image_details">ImageDetailsActivity</string>
     <string name="photo_title_label">Title:</string>
     <string name="photo_link_label">Link:</string>

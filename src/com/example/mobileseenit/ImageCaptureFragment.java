@@ -50,12 +50,18 @@ public class ImageCaptureFragment extends Fragment implements OnTouchListener, F
 	FocusManager mFManager;
 	PreviewLayout preLayout;
 	CameraLocationManager mLocationManager;
+	CaptureFragmentListener listener;
 	Parameters para = null;
 	int type;
 	int state;
 	
 	boolean previewIsRunning;
 	
+	public void setListener(CaptureFragmentListener listener){
+		this.listener = listener;
+		Log.i("set listener", "listener");
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -409,10 +415,10 @@ protected void stopPreview(){
             	Intent mediaScanIntent = new Intent( Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             	mediaScanIntent.setData(Uri.fromFile(file));
             	getActivity().sendBroadcast(mediaScanIntent);
-            	camera.stopPreview();
-            	camera.startPreview();       	
+            	stopPreview();      	
             	focus.showFocus();
             	mBitmap.recycle();
+            	listener.onSwitchToUpload(data, mLoc.getLatitude(),mLoc.getLongitude());
             	
             } catch(IOException e){
             	e.printStackTrace();
