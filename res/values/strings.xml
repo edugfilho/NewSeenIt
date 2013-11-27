@@ -16,14 +16,18 @@
     <string name="image_capture_flash">flash</string>
     <string name="image_upload_retake">Retake</string>
     <string name="image_upload_upload">Upload</string>
+    <string name="login_username_label">Username:</string>
+    <string name="login_password_label">Password:</string>
     <string name="title_activity_image_details">ImageDetailsActivity</string>
     <string name="photo_title_label">Title:</string>
     <string name="photo_link_label">Link:</string>
+    <string name="px_consumer_key">dZA3TRGzQovCSMnmKrTlg9wqWl14MeYpUSxbLGDm</string>
+    <string name="px_consumer_secret">LruK7dGr4Kyux1frxW9bHOcazGIS18DothLIYqvI</string>
     <string name="settings_image_diameter_label">Search Diameter:</string>
     <string name="settings_before_label">Images Before:</string>
     <string name="settings_after_label">Images After:</string>
     <string name="settings_flickr_label">Flickr:</string>
-    <string name="settings_instagram_label">Instagram:</string>
+    <string name="settings_500px_label">500px:</string>
     <string name="settings_not_logged_in">Not Logged In</string>
     <string-array name="SearchDiameters">
         <item>5 meters</item>
