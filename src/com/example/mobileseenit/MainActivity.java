@@ -20,6 +20,7 @@ import com.example.mobileseenit.apis.FlickrLoginDialog;
 import com.example.mobileseenit.apis.FlickrSearchTask;
 import com.example.mobileseenit.apis.FlickrUser;
 import com.example.mobileseenit.apis.PxLoginDialog;
+import com.example.mobileseenit.apis.PxSearchTask;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 import com.fivehundredpx.api.auth.AccessToken;
 
@@ -47,6 +48,7 @@ public class MainActivity extends FragmentActivity implements
 
 	// Shared API objects
 	Flickr flickr;
+
 
 
 	@Override
@@ -96,8 +98,14 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		photoList = new ArrayList<PhotoWrapper>();
+		
+		//Search Flickr images
 		FlickrSearchTask flickrSearch = new FlickrSearchTask(this);
 		flickrSearch.execute();
+		
+		//Search 500px Images
+		PxSearchTask pxSearchTask = new PxSearchTask(this);
+		pxSearchTask.execute("search");
 		
 
 		// Initialize Flickr Object
@@ -287,6 +295,8 @@ public class MainActivity extends FragmentActivity implements
 	public void setPxUser(AccessToken pxUser) {
 		this.pxUser = pxUser;
 	}
+	
+	
 
 	/**
 	 * Interface with FlickrLoginDialog
