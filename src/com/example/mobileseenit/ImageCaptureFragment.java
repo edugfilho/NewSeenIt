@@ -2,6 +2,7 @@ package com.example.mobileseenit;
 
 import android.support.v4.app.Fragment;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -418,7 +419,10 @@ protected void stopPreview(){
             	stopPreview();      	
             	focus.showFocus();
             	mBitmap.recycle();
-            	listener.onSwitchToUpload(data, new double[]{mLoc.getLatitude(),mLoc.getLongitude()}, file.getPath());
+            	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            	modifiedbMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            	byte[] myData = stream.toByteArray();
+            	listener.onSwitchToUpload(myData, new double[]{mLoc.getLatitude(),mLoc.getLongitude()}, file.getPath());
             	
             } catch(IOException e){
             	e.printStackTrace();

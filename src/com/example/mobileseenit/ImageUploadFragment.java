@@ -1,10 +1,15 @@
 package com.example.mobileseenit;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Location;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,10 +17,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.uploader.UploadMetaData;
+import com.example.mobileseenit.apis.FlickrUploadTask;
 
 public class ImageUploadFragment extends Fragment implements OnClickListener {
 	private CaptureFragmentListener listener;
@@ -27,6 +38,10 @@ public class ImageUploadFragment extends Fragment implements OnClickListener {
 	private double lon;
 	private Bitmap myImage;
 	private ImageView imageview;
+	private EditText title;
+	private EditText description;
+	private TextView tv_location;
+	private Flickr f;
 	
 	static ImageUploadFragment newInstance(byte[] image, double[] loc, String path){
 		ImageUploadFragment f = new ImageUploadFragment();
@@ -53,6 +68,9 @@ public class ImageUploadFragment extends Fragment implements OnClickListener {
 		imageview = (ImageView) rootView.findViewById(R.id.myImage);
 		back = (Button) rootView.findViewById(R.id.retake);
 		upload = (Button) rootView.findViewById(R.id.upload);
+		title = (EditText) rootView.findViewById(R.id.et_title);
+		description = (EditText) rootView.findViewById(R.id.et_decription);
+		tv_location = (TextView) rootView.findViewById(R.id.tv_location);
 		back.setOnClickListener(this);
 		upload.setOnClickListener(this);
 		Bundle args = this.getArguments();
@@ -70,6 +88,17 @@ public class ImageUploadFragment extends Fragment implements OnClickListener {
 		RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams)imageview.getLayoutParams();
 		p.height = (int) (p.width/ratio);
 		imageview.setImageBitmap(myImage);
+		Geocoder g = new Geocoder(this.getActivity(), Locale.getDefault());
+		try {
+			List<Address> list = g.getFromLocation(lat, lon, 1);
+			String address = "";
+			for(int i=0; i<list.get(0).getMaxAddressLineIndex();i++){
+				address = address + list.get(0).getAddressLine(i) + " ";
+			}
+			tv_location.setText(address);
+		} catch(IOException e){
+			Log.d("geocoder err", "err: " + e);
+		}
 		return rootView;
 	}
 
@@ -77,6 +106,18 @@ public class ImageUploadFragment extends Fragment implements OnClickListener {
 	public void onClick(View view) {
 		// TODO Auto-generated method stub
 		if(view==back){
+			listener.onSwitchToCapture();
+		}
+		else if(view==upload){
+			Log.i("upload", "upload");
+			f = ((MainActivity)this.getActivity()).getFlickr();
+			UploadMetaData uploadMetaData = new UploadMetaData();
+			uploadMetaData.setTitle(title.getText().toString());
+			uploadMetaData.setDescription(description.getText().toString());
+			FlickrUploadTask t = new FlickrUploadTask(f,data,uploadMetaData,this.getActivity());
+			t.execute("");
+			InputMethodManager imm = (InputMethodManager)this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
 			listener.onSwitchToCapture();
 		}
 	}

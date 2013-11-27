@@ -3,11 +3,16 @@ package com.example.mobileseenit.apis;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
+
+import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.RequestContext;
 import com.aetrion.flickr.uploader.UploadMetaData;
-
 /**
  * Async task used to upload a photo with metadata to Flickr. Uses the FlickrJ
  * library.
@@ -15,10 +20,28 @@ import com.aetrion.flickr.uploader.UploadMetaData;
  * @author dylanrunkel
  * 
  */
-public class FlickrUploadTask extends AsyncTask<String, Void, String> {
+public class FlickrUploadTask extends AsyncTask<String, Void, String>{
 
 	// Flickrj object
 	Flickr f;
+	Context context;
+	/* (non-Javadoc)
+	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+	 */
+	@Override
+	protected void onPostExecute(String result) {
+		// TODO Auto-generated method stub
+		super.onPostExecute(result);
+		if(result!=null){
+			if(result.equals("loginError")){
+				Toast.makeText(context, "Upload failed: User not logged in or login failed!",
+					     Toast.LENGTH_LONG).show();
+			}
+			else
+				Toast.makeText(context, "Upload successful!",
+					     Toast.LENGTH_LONG).show();
+		}
+	}
 
 	// Data array of photo (done in fragment before calling)
 	byte data[];
@@ -41,10 +64,11 @@ public class FlickrUploadTask extends AsyncTask<String, Void, String> {
 	 *            - meta data about the photo.
 	 */
 	public FlickrUploadTask(Flickr flickrObject, byte data[],
-			UploadMetaData metaData) {
+			UploadMetaData metaData, Context context) {
 		this.data = data;
 		this.meta = metaData;
 		this.f = flickrObject;
+		this.context = context;
 	}
 
 	@Override
@@ -74,7 +98,13 @@ public class FlickrUploadTask extends AsyncTask<String, Void, String> {
 		requestContext.setAuth(f.getAuth());
 
 		try {
-			f.getUploader().upload(data, meta);
+			return f.getUploader().upload(data, meta);
+		} catch (FlickrException e){
+			String err = e.getErrorCode();
+			Log.i("error code", "error code: "+err);
+			if(err.equals("99")||err.equals("98")){
+				return "loginError";
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
