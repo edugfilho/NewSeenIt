@@ -1,22 +1,18 @@
 package com.example.mobileseenit;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.location.Location;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 
 import com.aetrion.flickr.Flickr;
@@ -177,12 +173,12 @@ public class MainActivity extends FragmentActivity implements
 		private final class MyCaptureFragmentListener implements CaptureFragmentListener{
 
 			@Override
-			public void onSwitchToUpload(byte[] data, double lat, double lon) {
+			public void onSwitchToUpload(byte[] data, double[] loc, String path) {
 				// TODO Auto-generated method stub
 				fm.beginTransaction().remove(fragments.get(1)).commit();
 				if(fragments.get(1) instanceof ImageCaptureFragment){
 					ImageUploadFragment myUploadFragment;
-					myUploadFragment = ImageUploadFragment.newInstance(data, new double[]{lat,lon});
+					myUploadFragment = ImageUploadFragment.newInstance(data, loc, path);
 					myUploadFragment.setListener(listener);
 					fragments.set(1, myUploadFragment);
 					notifyDataSetChanged();
