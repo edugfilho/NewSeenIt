@@ -95,10 +95,12 @@ public class MainActivity extends FragmentActivity implements
 		photoList = new ArrayList<PhotoWrapper>();
 		FlickrSearchTask flickrSearch = new FlickrSearchTask(this);
 		flickrSearch.execute();
-		mViewPager.setCurrentItem(0);
+		
 
 		// Initialize Flickr Object
 		flickr = FlickrBuilder.buildFlickr();
+		
+		mViewPager.setCurrentItem(0);
 
 	}
 
