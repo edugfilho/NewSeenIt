@@ -20,4 +20,24 @@
         android:layout_alignParentTop="true"
         android:text="@string/image_upload_upload" />
 
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/retake"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/layout_border"
+        android:padding="3dp" >
+
+        <ImageView
+            android:id="@+id/myImage"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp" />
+    </RelativeLayout>
+
 </RelativeLayout>

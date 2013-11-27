@@ -1,10 +1,9 @@
 package com.example.mobileseenit;
 
-import java.io.File;
+import android.graphics.Bitmap;
 
-import android.location.Location;
 
 public interface CaptureFragmentListener {
-	void onSwitchToUpload(byte[] data, double lat, double lon);
+	void onSwitchToUpload(byte[] data, double[] loc, String path);
 	void onSwitchToCapture();
 }

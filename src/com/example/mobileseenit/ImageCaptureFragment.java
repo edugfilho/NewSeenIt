@@ -418,7 +418,7 @@ protected void stopPreview(){
             	stopPreview();      	
             	focus.showFocus();
             	mBitmap.recycle();
-            	listener.onSwitchToUpload(data, mLoc.getLatitude(),mLoc.getLongitude());
+            	listener.onSwitchToUpload(data, new double[]{mLoc.getLatitude(),mLoc.getLongitude()}, file.getPath());
             	
             } catch(IOException e){
             	e.printStackTrace();
