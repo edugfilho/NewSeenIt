@@ -1,17 +1,22 @@
 package com.example.mobileseenit;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 
 import com.aetrion.flickr.Flickr;
@@ -149,15 +154,70 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-		private List<Fragment> fragments;
+		/* (non-Javadoc)
+		 * @see android.support.v4.view.PagerAdapter#getItemPosition(java.lang.Object)
+		 */
+		@Override
+		public int getItemPosition(Object object) {
+			// TODO Auto-generated method stub
+			if(object instanceof ImageCaptureFragment && 
+					fragments.get(1) instanceof ImageUploadFragment){
+				return POSITION_NONE;
+			}
+			if(object instanceof ImageUploadFragment && 
+					fragments.get(1) instanceof ImageCaptureFragment){
+				return POSITION_NONE;
+			}
+			return POSITION_UNCHANGED;
+		}
 
+		private List<Fragment> fragments;
+		private FragmentManager fm;
+		private MyCaptureFragmentListener listener = new MyCaptureFragmentListener();
+		private final class MyCaptureFragmentListener implements CaptureFragmentListener{
+
+			@Override
+			public void onSwitchToUpload(byte[] data, double lat, double lon) {
+				// TODO Auto-generated method stub
+				fm.beginTransaction().remove(fragments.get(1)).commit();
+				if(fragments.get(1) instanceof ImageCaptureFragment){
+					ImageUploadFragment myUploadFragment;
+					myUploadFragment = ImageUploadFragment.newInstance(data, new double[]{lat,lon});
+					myUploadFragment.setListener(listener);
+					fragments.set(1, myUploadFragment);
+					notifyDataSetChanged();
+					startUpdate(mViewPager);
+				}
+				
+			}
+
+			@Override
+			public void onSwitchToCapture() {
+				// TODO Auto-generated method stub
+				fm.beginTransaction().remove(fragments.get(1)).commit();
+				if(fragments.get(1) instanceof ImageUploadFragment){
+					ImageCaptureFragment myCptFragment = new ImageCaptureFragment();
+					myCptFragment.setListener(listener);
+					fragments.set(1, myCptFragment);
+					notifyDataSetChanged();
+					startUpdate(mViewPager);
+				}
+			}
+		}
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
+			this.fm = fm;
 		}
 
 		public SectionsPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
 			super(fm);
 			this.fragments = fragments;
+			this.fm = fm;
+			if(this.fragments.get(1) instanceof ImageCaptureFragment){
+				ImageCaptureFragment myCaptureFragment = (ImageCaptureFragment) this.fragments.get(1);
+				myCaptureFragment.setListener(listener);
+				//this.fragments.set(1, myCaptureFragment);
+			}
 		}
 
 		@Override
@@ -198,6 +258,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 			return null;
 		}
+		
 	}
 
 	public FlickrUser getFlickrUser() {
