@@ -9,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -40,10 +41,13 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 	// Array of bitmaps to return to the fragment
 	private ArrayList<PhotoWrapper> photos;
+	
+
 
 	public FlickrSearchTask(Activity g) {
 
 		this.g = (MainActivity) g;
+		
 		// Setup flickrJ object
 		try {
 			f = new Flickr(API_KEY, SECRET_KEY, new REST());
@@ -131,7 +135,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		} catch (Exception e) {
 			Log.e("Error", e.getMessage());
 			e.printStackTrace();
-		}
+		}	
 		return mIcon11;
 	}
 

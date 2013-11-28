@@ -18,6 +18,8 @@ import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class MainFragment extends Fragment implements OnTouchListener,  OnClickListener{
 
+	ArrayList<PhotoWrapper> photos= null;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -25,6 +27,23 @@ public class MainFragment extends Fragment implements OnTouchListener,  OnClickL
 		View rootView = inflater.inflate(R.layout.fragment_main,
 				container, false);
 		
+		//Display images
+		MainActivity mainActivity = (MainActivity) getActivity();
+		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
+		if(photos != null && photos.size() > 0 )
+		{
+			//Hide progress spinner
+			ProgressBar progressBar = (ProgressBar)rootView.findViewById(R.id.photo_load_progress_bar);
+			progressBar.setVisibility(View.GONE);
+			
+			for (PhotoWrapper p : photos ) {
+
+				LinearLayout r = (LinearLayout) rootView.findViewById(R.id.photo_stream);
+				PhotoStreamImageView newImage = new PhotoStreamImageView(getActivity(), p);
+				r.addView(newImage);
+			}
+		}
+				
 		return rootView;
 	}
 	

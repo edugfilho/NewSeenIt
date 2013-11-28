@@ -6,7 +6,6 @@ import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -16,16 +15,19 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
 import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.auth.Auth;
 import com.example.mobileseenit.apis.FlickrBuilder;
 import com.example.mobileseenit.apis.FlickrLoginDialog;
 import com.example.mobileseenit.apis.FlickrSearchTask;
 import com.example.mobileseenit.apis.FlickrUser;
+import com.example.mobileseenit.apis.PxLoginDialog;
+import com.example.mobileseenit.apis.PxSearchTask;
 import com.example.mobileseenit.helpers.PhotoWrapper;
+import com.fivehundredpx.api.auth.AccessToken;
 
 public class MainActivity extends FragmentActivity implements
 		ActionBar.TabListener, FlickrLoginDialog.OnFlickrLoggedInListener,
-		FlickrLoginDialog.OnUpdateFlickrListener{
+		FlickrLoginDialog.OnUpdateFlickrListener,
+		PxLoginDialog.OnPxLoggedInListener{
 
 	// View Pager
 	SectionsPagerAdapter mSectionsPagerAdapter;
@@ -34,6 +36,7 @@ public class MainActivity extends FragmentActivity implements
 	// Currently loaded photos
 	ArrayList<PhotoWrapper> photoList;
 
+	
 	// Fragments
 	MainFragment mainFragment;
 	SettingsFragment settingsFragment;
@@ -41,9 +44,11 @@ public class MainActivity extends FragmentActivity implements
 
 	// user objects
 	FlickrUser flickrUser;
+	AccessToken pxUser;
 
 	// Shared API objects
 	Flickr flickr;
+
 
 
 	@Override
@@ -93,12 +98,20 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		photoList = new ArrayList<PhotoWrapper>();
+		
+		//Search Flickr images
 		FlickrSearchTask flickrSearch = new FlickrSearchTask(this);
 		flickrSearch.execute();
-		mViewPager.setCurrentItem(0);
+		
+		//Search 500px Images
+		PxSearchTask pxSearchTask = new PxSearchTask(this);
+		pxSearchTask.execute("search");
+		
 
 		// Initialize Flickr Object
 		flickr = FlickrBuilder.buildFlickr();
+		
+		mViewPager.setCurrentItem(0);
 
 	}
 
@@ -273,6 +286,17 @@ public class MainActivity extends FragmentActivity implements
 		this.flickr = flickr;
 	}
 	
+	
+
+	public AccessToken getPxUser() {
+		return pxUser;
+	}
+
+	public void setPxUser(AccessToken pxUser) {
+		this.pxUser = pxUser;
+	}
+	
+	
 
 	/**
 	 * Interface with FlickrLoginDialog
@@ -282,7 +306,7 @@ public class MainActivity extends FragmentActivity implements
 		System.out.println("FLickr User Logged in!");
 		this.flickrUser = u;
 
-		// Update info
+		// Update info in settings fragment
 		settingsFragment.updateUserInfo();
 	}
 
@@ -290,6 +314,15 @@ public class MainActivity extends FragmentActivity implements
 	public void onUpdateFlickr(Flickr f) {
 		System.out.println("Update Flickr object!");
 		this.flickr = f;
+	}
+
+	@Override
+	public void onPxLoggedIn(AccessToken user) {
+		System.out.println("500 px User logged in!");
+		this.pxUser = user;
+		
+		//Update info in settings fragment
+		settingsFragment.updateUserInfo();
 	}
 
 }

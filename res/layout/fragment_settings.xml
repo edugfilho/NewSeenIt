@@ -126,10 +126,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:text="@string/settings_instagram_label"
+                    android:text="@string/settings_500px_label"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
                 <TextView
+                    android:id="@+id/px_username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
@@ -138,7 +139,7 @@
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <ImageButton
-                    android:id="@+id/imageButton1"
+                    android:id="@+id/add_500px_account_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"

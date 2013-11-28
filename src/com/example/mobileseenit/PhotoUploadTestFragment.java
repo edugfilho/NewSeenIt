@@ -74,8 +74,8 @@ public class PhotoUploadTestFragment extends Fragment implements
 
 			byte data[] = out.toByteArray();
 			
-			FlickrUploadTask t = new FlickrUploadTask(f,data, uploadMetaData, this.getActivity());
-			t.execute("");
+			//FlickrUploadTask t = new FlickrUploadTask(f,data, uploadMetaData, this.getActivity());
+			//t.execute("");
 			
 
 		}

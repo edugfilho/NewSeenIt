@@ -2,6 +2,9 @@ package com.example.mobileseenit.helpers;
 
 import java.util.HashMap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.graphics.Bitmap;
 
 import com.aetrion.flickr.photos.Photo;
@@ -15,6 +18,7 @@ public class PhotoWrapper {
 	// Type constants
 	public static final String FLICKR_OBJECT = "FLICKR_OBJECT_TYPE";
 	public static final String INSTAGRAM_OBJECT = "INSTAGRAM_OBJECT_TYPE";
+	public static final String PX_OBJECT = "500PX_OBJECT_TYPE";
 
 	// Field constants
 	public static final String TITLE_FIELD = "TITLE_FIELD_KEY"; // title/caption
@@ -32,6 +36,9 @@ public class PhotoWrapper {
 			detailMap = processFlickr(rawPhoto);
 		} else if (type.equals(INSTAGRAM_OBJECT)) {
 			detailMap = processInstagrm(rawPhoto);
+		}
+		else if(type.equals(PX_OBJECT)){
+			detailMap = processPx(rawPhoto);
 		}
 	}
 
@@ -55,6 +62,25 @@ public class PhotoWrapper {
 		details.put(LINK_FIELD, "dummylink");
 
 		return details;
+	}
+	
+	//Convert 500px json object to fields
+	private HashMap<String, String> processPx(Object o){
+		
+		//Grab the object
+		JSONObject jsonPhoto = (JSONObject) o;
+		HashMap<String,String> details = new HashMap<String,String>();
+		
+		try {
+			details.put(TITLE_FIELD, jsonPhoto.getString("description") );
+			details.put(LINK_FIELD, jsonPhoto.getString("image_url"));
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return details;
+		
 	}
 
 	//Access Methods
