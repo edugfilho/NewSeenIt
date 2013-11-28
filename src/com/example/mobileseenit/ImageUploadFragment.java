@@ -1,6 +1,5 @@
 package com.example.mobileseenit;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -19,10 +18,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.uploader.UploadMetaData;
@@ -41,6 +42,8 @@ public class ImageUploadFragment extends Fragment implements OnClickListener {
 	private EditText title;
 	private EditText description;
 	private TextView tv_location;
+	private CheckBox cb_flickr;
+	private CheckBox cb_500px;
 	private Flickr f;
 	
 	static ImageUploadFragment newInstance(byte[] image, double[] loc, String path){
@@ -71,6 +74,8 @@ public class ImageUploadFragment extends Fragment implements OnClickListener {
 		title = (EditText) rootView.findViewById(R.id.et_title);
 		description = (EditText) rootView.findViewById(R.id.et_decription);
 		tv_location = (TextView) rootView.findViewById(R.id.tv_location);
+		cb_flickr = (CheckBox) rootView.findViewById(R.id.cb_flickr);
+		cb_500px = (CheckBox) rootView.findViewById(R.id.cb_500px);
 		back.setOnClickListener(this);
 		upload.setOnClickListener(this);
 		Bundle args = this.getArguments();
@@ -110,16 +115,37 @@ public class ImageUploadFragment extends Fragment implements OnClickListener {
 		}
 		else if(view==upload){
 			Log.i("upload", "upload");
-			f = ((MainActivity)this.getActivity()).getFlickr();
-			UploadMetaData uploadMetaData = new UploadMetaData();
-			uploadMetaData.setTitle(title.getText().toString());
-			uploadMetaData.setDescription(description.getText().toString());
-			FlickrUploadTask t = new FlickrUploadTask(f,data,uploadMetaData,this.getActivity());
-			t.execute("");
-			InputMethodManager imm = (InputMethodManager)this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-			imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
-			listener.onSwitchToCapture();
+			if(!cb_flickr.isChecked()&&!cb_500px.isChecked()){
+				Toast.makeText(this.getActivity(), "Please select Flickr and/or 500px to upload to.",
+					     Toast.LENGTH_LONG).show();
+			}
+			else{
+				if(cb_flickr.isChecked()){
+					uploadToFlickr();
+				}
+				if(cb_500px.isChecked()){
+					uploadTo500px();
+				}
+				InputMethodManager imm = (InputMethodManager)this.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(title.getWindowToken(), 0);
+				listener.onSwitchToCapture();
+			}
+			
 		}
+	}
+	private void uploadToFlickr(){
+		f = ((MainActivity)this.getActivity()).getFlickr();
+		UploadMetaData uploadMetaData = new UploadMetaData();
+		uploadMetaData.setTitle(title.getText().toString());
+		uploadMetaData.setDescription(description.getText().toString());
+		FlickrUploadTask t = new FlickrUploadTask(f,data,uploadMetaData,this.getActivity());
+		t.execute("");
+	}
+	private void uploadTo500px(){
+		
+		//Place your uploadTo500px code here.
+		
+		
 	}
 	
 }
