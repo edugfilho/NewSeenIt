@@ -57,9 +57,11 @@
             android:layout_alignLeft="@+id/tv_title"
             android:layout_below="@id/tv_title"
             android:ems="10"
+            android:lines="1"
             android:gravity="center_vertical|top"
             android:inputType="textMultiLine"
-            android:scrollHorizontally="false" >
+            android:scrollHorizontally="false"
+            android:textAppearance="?android:attr/textAppearanceSmall" >
 
             <requestFocus />
         </EditText>
@@ -81,9 +83,11 @@
             android:layout_alignLeft="@+id/tv_description"
             android:layout_below="@+id/tv_description"
             android:ems="10"
+            android:lines="1"
             android:gravity="center_vertical|top"
             android:inputType="textMultiLine"
-            android:scrollHorizontally="false" />
+            android:scrollHorizontally="false"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
             android:id="@+id/tv_location"
@@ -93,6 +97,34 @@
             android:layout_below="@+id/myImage"
             android:layout_marginTop="3dp"
             android:text=""
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <TextView
+            android:id="@+id/tv_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tv_location"
+            android:layout_below="@+id/tv_location"
+            android:layout_marginTop="8dp"
+            android:text="Upload to:"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <CheckBox
+            android:id="@+id/cb_flickr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/tv_upload"
+            android:layout_below="@+id/tv_upload"
+            android:text="Flickr"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <CheckBox
+            android:id="@+id/cb_500px"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/cb_flickr"
+            android:layout_below="@+id/cb_flickr"
+            android:text="500px"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
     </RelativeLayout>
