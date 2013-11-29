@@ -44,11 +44,6 @@ public class SeenItLocation implements LocationListener {
 		if (!gps_enabled && !network_enabled) {
 			return false;
 		}
-/*		if (gps_enabled) {
-			locationManager.requestLocationUpdates (
-					LocationManager.GPS_PROVIDER, updateIntervalTimeMilisec, 1, locationListenerGps);
-
-		}*/
 
 		timer1 = new Timer();
 		timer1.schedule(new GetLastLocation(), 30000);

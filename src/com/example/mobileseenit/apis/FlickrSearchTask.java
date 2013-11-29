@@ -78,6 +78,8 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		// Create tag keyword array
 		String[] tags = new String[] { "Dog", "Beagle" };
 		searchParams.setTags(tags);
+		searchParams.setLatitude(g.getLat().toString());
+		searchParams.setLongitude(g.getLng().toString());
 
 		// Initialize PhotosInterface object
 		PhotosInterface photosInterface = f.getPhotosInterface();

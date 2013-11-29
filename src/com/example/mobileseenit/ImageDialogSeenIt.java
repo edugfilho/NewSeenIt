@@ -3,15 +3,13 @@ package com.example.mobileseenit;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.mobileseenit.helpers.PhotoWrapper;
+import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 
 public class ImageDialogSeenIt extends DialogFragment {
 	private Dialog mDialog;
@@ -24,9 +22,23 @@ public class ImageDialogSeenIt extends DialogFragment {
 		f.pWrapper = p;
 		return f;
 	}
+	
+	static ImageDialogSeenIt newInstance(String imgUrl) {
+        ImageDialogSeenIt f = new ImageDialogSeenIt();
+        f.imgUrl = imgUrl;
+        return f;
+}
 
-
-	@Override
+	 @Override
+     public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                     Bundle savedInstanceState) {
+             View v = inflater.inflate(R.layout.fragment_dialog, container, false);
+             imgView = (ImageView) v.findViewById(R.id.imageDialog);
+             UrlImageViewHelper.setUrlDrawable(imgView, imgUrl);
+             return v;
+     }
+	 
+	/*@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_dialog, container, false);
@@ -48,7 +60,7 @@ public class ImageDialogSeenIt extends DialogFragment {
 	                "<a href=" +pWrapper.getDetailMap().get(PhotoWrapper.LINK_FIELD) +">View Online</a> "));
 	    link.setMovementMethod(LinkMovementMethod.getInstance());
 		return v;
-	}
+	}*/
 
 	public Dialog getmDialog() {
 		return mDialog;

@@ -3,9 +3,12 @@ package com.example.mobileseenit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.TreeMap;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -13,9 +16,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
+import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.auth.Auth;
+import com.example.mobileseenit.SeenItLocation.LocationResult;
 import com.example.mobileseenit.apis.FlickrBuilder;
 import com.example.mobileseenit.apis.FlickrLoginDialog;
 import com.example.mobileseenit.apis.FlickrSearchTask;
@@ -24,7 +28,7 @@ import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class MainActivity extends FragmentActivity implements
 		ActionBar.TabListener, FlickrLoginDialog.OnFlickrLoggedInListener,
-		FlickrLoginDialog.OnUpdateFlickrListener{
+		FlickrLoginDialog.OnUpdateFlickrListener {
 
 	// View Pager
 	SectionsPagerAdapter mSectionsPagerAdapter;
@@ -45,6 +49,15 @@ public class MainActivity extends FragmentActivity implements
 	// Shared API objects
 	Flickr flickr;
 
+	// Location settings
+	SettingsFragment settings;
+
+	Double lat;
+	Double lng;
+
+	SeenItLocation loc;
+	
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,18 +67,21 @@ public class MainActivity extends FragmentActivity implements
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
+		//Initialize location object
+		loc = new SeenItLocation();
 
 		// Add your fragments here
 		mainFragment = new MainFragment();
 		settingsFragment = new SettingsFragment();
 		uploadTestFragment = new PhotoUploadTestFragment();
-		instagramFragment = new InstagramFragment();
+		//instagramFragment = new InstagramFragment();
 		List<Fragment> fragments = new ArrayList<Fragment>();
 		fragments.add(mainFragment);
 		fragments.add(new ImageCaptureFragment());
 		fragments.add(settingsFragment);
 		fragments.add(uploadTestFragment);
-		fragments.add(instagramFragment);
+		// fragments.add(instagramFragment);
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
@@ -95,8 +111,9 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		photoList = new ArrayList<PhotoWrapper>();
-		FlickrSearchTask flickrSearch = new FlickrSearchTask(this);
-		flickrSearch.execute();
+
+
+
 		mViewPager.setCurrentItem(0);
 
 		// Initialize Flickr Object
@@ -119,6 +136,9 @@ public class MainActivity extends FragmentActivity implements
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
+	
+
 
 	@Override
 	public void onTabSelected(ActionBar.Tab tab,
@@ -220,7 +240,6 @@ public class MainActivity extends FragmentActivity implements
 	public void setFlickr(Flickr flickr) {
 		this.flickr = flickr;
 	}
-	
 
 	/**
 	 * Interface with FlickrLoginDialog
@@ -239,5 +258,31 @@ public class MainActivity extends FragmentActivity implements
 		System.out.println("Update Flickr object!");
 		this.flickr = f;
 	}
+
+	public Double getLat() {
+		return lat;
+	}
+
+	public void setLat(Double lat) {
+		this.lat = lat;
+	}
+
+	public Double getLng() {
+		return lng;
+	}
+
+	public void setLng(Double lng) {
+		this.lng = lng;
+	}
+
+	public SeenItLocation getLoc() {
+		return loc;
+	}
+
+	public void setLoc(SeenItLocation loc) {
+		this.loc = loc;
+	}
+
+
 
 }
