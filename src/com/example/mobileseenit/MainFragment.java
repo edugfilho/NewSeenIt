@@ -1,6 +1,7 @@
 package com.example.mobileseenit;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import android.location.Location;
 import android.location.LocationManager;
@@ -18,56 +19,51 @@ import android.widget.Toast;
 
 import com.example.mobileseenit.SeenItLocation.LocationResult;
 import com.example.mobileseenit.apis.FlickrSearchTask;
+import com.example.mobileseenit.apis.PxSearchTask;
 import com.example.mobileseenit.helpers.PhotoStreamImageView;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 
 public class MainFragment extends Fragment implements OnTouchListener,
 		OnClickListener {
 
+	ArrayList<PhotoWrapper> photos = null;
+	PxSearchTask pxSearchTask;
 	FlickrSearchTask flickrSearch;
-	MainActivity mainAct;
+	MainActivity mainActivity;
 
 	LocationResult locationResult = new LocationResult() {
 		@Override
 		public void gotLocation(Location location) {
-			// It's called after location is obtained. Now that it has lat and
-			// lng, it can search for pictures
-			mainAct.setLat(location.getLatitude());
-			mainAct.setLng(location.getLongitude());
-			
-			//Only displays pictures on the screen if there are none
-			if (mainAct.getPhotoList().isEmpty()) {
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
 
-						Toast.makeText(getActivity().getApplicationContext(),
-								"Location acquired. Displaying pictures",
-								Toast.LENGTH_SHORT).show();
-					}
-				});
+			// It's called only when the location is changed. Now that it has
+			// new
+			// lat and lng, it can search for new photos
 
-				flickrSearch = new FlickrSearchTask(getActivity());
-				flickrSearch.execute();
-			}
+			mainActivity.setLat(location.getLatitude());
+			mainActivity.setLng(location.getLongitude());
+
+			mainActivity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+
+					// if (mainActivity.getPhotoList().isEmpty()) {
+					Toast.makeText(mainActivity.getApplicationContext(),
+							"Location acquired. Displaying pictures",
+							Toast.LENGTH_SHORT).show();
+
+					flickrSearch = new FlickrSearchTask(getActivity());
+					flickrSearch.execute();
+
+					// Search 500px Images
+					 pxSearchTask = new PxSearchTask(getActivity());
+					 pxSearchTask.execute("search");
+
+				}
+			});
 
 		}
+
 	};
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-
-		View rootView = inflater.inflate(R.layout.fragment_main, container,
-				false);
-
-		mainAct = (MainActivity) getActivity();
-
-		// Gets location and calls gotLocation when it's done
-		mainAct.getLoc().getLocation(getActivity(), locationResult);
-
-		return rootView;
-	}
 
 	public void updateDisplayedPhotos() {
 		// Hide progress spinner
@@ -76,7 +72,6 @@ public class MainFragment extends Fragment implements OnTouchListener,
 		progressBar.setVisibility(View.GONE);
 
 		// Display images
-		MainActivity mainActivity = (MainActivity) getActivity();
 		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
 		for (PhotoWrapper p : photos) {
 
@@ -87,6 +82,20 @@ public class MainFragment extends Fragment implements OnTouchListener,
 			r.addView(newImage);
 		}
 
+	}
+
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View rootView = inflater.inflate(R.layout.fragment_main, container,
+				false);
+
+		mainActivity = (MainActivity) getActivity();
+
+		Toast.makeText(getActivity(), "CreateView", Toast.LENGTH_SHORT).show();
+		return rootView;
 	}
 
 	@Override
@@ -103,32 +112,30 @@ public class MainFragment extends Fragment implements OnTouchListener,
 	@Override
 	public void onPause() {
 		// Stops any location request
-		mainAct.getLoc().getLocationManager()
-				.removeUpdates(mainAct.getLoc().locationListenerGps);
+		/*
+		 * mainActivity.getLoc().getLocationManager()
+		 * .removeUpdates(mainActivity.getLoc().locationListenerGps);
+		 */
 		super.onPause();
 	}
 
 	@Override
 	public void onStop() {
 		// Stops any location request
-		mainAct.getLoc().getLocationManager()
-				.removeUpdates(mainAct.getLoc().locationListenerGps);
+		mainActivity.getLoc().getLocationManager()
+				.removeUpdates(mainActivity.getLoc().locationListenerGps);
 		super.onPause();
 	}
 
 	@Override
 	public void onResume() {
-		// When the app is resumed, location updates start being requested again
-		if (mainAct.getLoc().gps_enabled) {
-			mainAct.getLoc()
-					.getLocationManager()
-					.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-							mainAct.getLoc().getUpdateIntervalTimeMilisec(),
-							1000, mainAct.getLoc().locationListenerGps);
-			Toast.makeText(getActivity(), "Getting location...",
-					Toast.LENGTH_SHORT).show();
 
-		}
+		mainActivity.getLoc().getLocation(getActivity(), locationResult);
+
+		Toast.makeText(getActivity(), "Getting location...", Toast.LENGTH_SHORT)
+				.show();
+
 		super.onResume();
 	}
+
 }

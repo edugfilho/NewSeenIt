@@ -3,6 +3,7 @@ package com.example.mobileseenit.apis;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -11,8 +12,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.REST;
 import com.aetrion.flickr.photos.Photo;
 import com.aetrion.flickr.photos.PhotoList;
@@ -24,7 +27,7 @@ import com.example.mobileseenit.helpers.PhotoWrapper;
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 	// Number of images to load at once.
-	private static final int LOAD_COUNT = 2;
+	private static final int LOAD_COUNT = 10;
 
 	// API key
 	private static final String API_KEY = "af76271af34e193bd2f002eb32032e01";
@@ -39,11 +42,12 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	private Flickr f;
 
 	// Array of bitmaps to return to the fragment
-	private ArrayList<PhotoWrapper> photos;
+	private LinkedList<PhotoWrapper> photos;
 
 	public FlickrSearchTask(Activity g) {
 
 		this.g = (MainActivity) g;
+
 		// Setup flickrJ object
 		try {
 			f = new Flickr(API_KEY, SECRET_KEY, new REST());
@@ -68,7 +72,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	private String search(String... searchTerms) throws IOException {
 
 		// Initialize list of imageviews
-		photos = new ArrayList<PhotoWrapper>();
+		photos = new LinkedList<PhotoWrapper>();
 
 		// initialize SearchParameter object, this object stores the search
 		// keyword
@@ -77,9 +81,22 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 		// Create tag keyword array
 		String[] tags = new String[] { "Dog", "Beagle" };
-		searchParams.setTags(tags);
+		// searchParams.setTags(tags);
+		try {
+			searchParams.setMedia("photos");
+		} catch (FlickrException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		searchParams.setHasGeo(true);
 		searchParams.setLatitude(g.getLat().toString());
 		searchParams.setLongitude(g.getLng().toString());
+		searchParams.setRadius(g.getRadius().intValue());
+		searchParams.setRadiusUnits("km");
+		searchParams.setMinTakenDate(g.getImgsAfter()
+				.getTime());
+		searchParams.setMaxTakenDate(g.getImgsBefore()
+				.getTime());
 
 		// Initialize PhotosInterface object
 		PhotosInterface photosInterface = f.getPhotosInterface();
@@ -98,23 +115,31 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 					// get photo object
 					Photo photo = (Photo) photoList.get(i);
 
-					// construct url
-					// http://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
-					StringBuilder urlBuilder = new StringBuilder();
-					urlBuilder.append("http://farm");
-					urlBuilder.append(photo.getFarm());
-					urlBuilder.append(".staticflickr.com/");
-					urlBuilder.append(photo.getServer());
-					urlBuilder.append("/");
-					urlBuilder.append(photo.getId());
-					urlBuilder.append("_");
-					urlBuilder.append(photo.getSecret());
-					urlBuilder.append(".jpg");
-					Bitmap b = process(urlBuilder.toString());
-					
-					//Construct new photowrapper for each image.
-					PhotoWrapper newPhoto = new PhotoWrapper(b, photoList.get(i), PhotoWrapper.FLICKR_OBJECT);
-					photos.add(newPhoto);
+					// Checks if the photo isn't already in the photoList before
+					// adding
+					if (!g.getUrls().contains(photo.getUrl())) {
+						// construct url
+						// http://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
+						StringBuilder urlBuilder = new StringBuilder();
+						urlBuilder.append("http://farm");
+						urlBuilder.append(photo.getFarm());
+						urlBuilder.append(".staticflickr.com/");
+						urlBuilder.append(photo.getServer());
+						urlBuilder.append("/");
+						urlBuilder.append(photo.getId());
+						urlBuilder.append("_");
+						urlBuilder.append(photo.getSecret());
+						urlBuilder.append(".jpg");
+
+						Bitmap b = process(urlBuilder.toString());
+
+						// Construct new photowrapper for each image.
+						PhotoWrapper newPhoto = new PhotoWrapper(b,
+								photoList.get(i), PhotoWrapper.FLICKR_OBJECT);
+						photos.add(newPhoto);
+
+					}
+
 				}
 			}
 		} catch (Exception e) {
@@ -140,7 +165,16 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	// onPostExecute displays the results of the AsyncTask.
 	@Override
 	protected void onPostExecute(String result) {
+		// TODO keep it?\/
+		if (photos.isEmpty()) {
+			Toast.makeText(g, "Flickr didn't find anything", Toast.LENGTH_SHORT)
+					.show();
+		} else {
+			Toast.makeText(g, "Flickr photos loaded", Toast.LENGTH_SHORT)
+					.show();
+		}
 		g.addPhotos(photos);
+
 	}
 
 }
