@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.mobileseenit.apis.FlickrSearchTask;
 
@@ -78,5 +80,7 @@ public class FlickrFragment extends Fragment implements OnTouchListener,
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+
 
 }

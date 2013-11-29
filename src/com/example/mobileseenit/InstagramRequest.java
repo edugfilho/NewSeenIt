@@ -17,7 +17,8 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class InstagramRequest extends AsyncTask<String, Integer, TreeMap<String, String>> {
+public class InstagramRequest extends
+		AsyncTask<String, Integer, TreeMap<String, String>> {
 
 	private static final String AUTHURL = "https://api.instagram.com/oauth/authorize/";
 	private static final String TOKENURL = "https://api.instagram.com/oauth/access_token";

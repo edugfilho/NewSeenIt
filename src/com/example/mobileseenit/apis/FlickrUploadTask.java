@@ -13,6 +13,7 @@ import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.RequestContext;
 import com.aetrion.flickr.uploader.UploadMetaData;
+
 /**
  * Async task used to upload a photo with metadata to Flickr. Uses the FlickrJ
  * library.
@@ -20,26 +21,29 @@ import com.aetrion.flickr.uploader.UploadMetaData;
  * @author dylanrunkel
  * 
  */
-public class FlickrUploadTask extends AsyncTask<String, Void, String>{
+public class FlickrUploadTask extends AsyncTask<String, Void, String> {
 
 	// Flickrj object
 	Flickr f;
 	Context context;
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
 	 */
 	@Override
 	protected void onPostExecute(String result) {
 		// TODO Auto-generated method stub
 		super.onPostExecute(result);
-		if(result!=null){
-			if(result.equals("loginError")){
-				Toast.makeText(context, "Upload failed: User not logged in or login failed!",
-					     Toast.LENGTH_LONG).show();
-			}
-			else
-				Toast.makeText(context, "Upload successful!",
-					     Toast.LENGTH_LONG).show();
+		if (result != null) {
+			if (result.equals("loginError")) {
+				Toast.makeText(context,
+						"Upload failed: User not logged in or login failed!",
+						Toast.LENGTH_LONG).show();
+			} else
+				Toast.makeText(context, "Upload successful!", Toast.LENGTH_LONG)
+						.show();
 		}
 	}
 
@@ -99,10 +103,10 @@ public class FlickrUploadTask extends AsyncTask<String, Void, String>{
 
 		try {
 			return f.getUploader().upload(data, meta);
-		} catch (FlickrException e){
+		} catch (FlickrException e) {
 			String err = e.getErrorCode();
-			Log.i("error code", "error code: "+err);
-			if(err.equals("99")||err.equals("98")){
+			Log.i("error code", "error code: " + err);
+			if (err.equals("99") || err.equals("98")) {
 				return "loginError";
 			}
 		} catch (Exception e) {

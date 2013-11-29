@@ -1,11 +1,14 @@
 package com.example.mobileseenit;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -13,21 +16,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
+import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
 import com.example.mobileseenit.apis.FlickrBuilder;
 import com.example.mobileseenit.apis.FlickrLoginDialog;
-import com.example.mobileseenit.apis.FlickrSearchTask;
 import com.example.mobileseenit.apis.FlickrUser;
 import com.example.mobileseenit.apis.PxLoginDialog;
-import com.example.mobileseenit.apis.PxSearchTask;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 import com.fivehundredpx.api.auth.AccessToken;
 
 public class MainActivity extends FragmentActivity implements
 		ActionBar.TabListener, FlickrLoginDialog.OnFlickrLoggedInListener,
 		FlickrLoginDialog.OnUpdateFlickrListener,
-		PxLoginDialog.OnPxLoggedInListener{
+		PxLoginDialog.OnPxLoggedInListener {
 
 	// View Pager
 	SectionsPagerAdapter mSectionsPagerAdapter;
@@ -36,7 +38,8 @@ public class MainActivity extends FragmentActivity implements
 	// Currently loaded photos
 	ArrayList<PhotoWrapper> photoList;
 
-	
+	ArrayList<String> urls;
+
 	// Fragments
 	MainFragment mainFragment;
 	SettingsFragment settingsFragment;
@@ -49,7 +52,16 @@ public class MainActivity extends FragmentActivity implements
 	// Shared API objects
 	Flickr flickr;
 
+	// Location objects
+	Double lat;
+	Double lng;
+	Double radius;
 
+	SeenItLocation loc;
+
+	// Settings
+	public Calendar imgsAfter;
+	public Calendar imgsBefore;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +71,26 @@ public class MainActivity extends FragmentActivity implements
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+		// Initialize location object
+		loc = new SeenItLocation();
+		radius = 1.0; // default value, change for constant
+
+		
+		if (getLoc().gps_enabled) {
+			getLoc().getLocationManager().requestLocationUpdates(
+					LocationManager.GPS_PROVIDER,
+					getLoc().getUpdateIntervalTimeMilisec(),
+					getRadius().floatValue(), getLoc().locationListenerGps);
+			Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT)
+					.show();
+
+		}
+
+		// Set settings default values
+		imgsAfter = Calendar.getInstance();
+		// imgsAfter.set(Calendar.YEAR, 1990);
+		imgsBefore = Calendar.getInstance();
 
 		// Add your fragments here
 		mainFragment = new MainFragment();
@@ -98,27 +130,23 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		photoList = new ArrayList<PhotoWrapper>();
-		
-		//Search Flickr images
-		FlickrSearchTask flickrSearch = new FlickrSearchTask(this);
-		flickrSearch.execute();
-		
-		//Search 500px Images
-		PxSearchTask pxSearchTask = new PxSearchTask(this);
-		pxSearchTask.execute("search");
-		
+		urls = new ArrayList<String>();
 
 		// Initialize Flickr Object
 		flickr = FlickrBuilder.buildFlickr();
-		
+
 		mViewPager.setCurrentItem(0);
 
 	}
 
 	// Can be called from search methods. Adds the PhotoWrappers to
 	// the current list
-	public void addPhotos(ArrayList<PhotoWrapper> photos) {
+	public void addPhotos(LinkedList<PhotoWrapper> photos) {
 
+		// Store photo url
+		for (PhotoWrapper photoWrapper : photos) {
+			urls.add(photoWrapper.getDetailMap().get(PhotoWrapper.LINK_FIELD));
+		}
 		photoList.addAll(photos);
 		if (!mainFragment.isDetached())
 			mainFragment.updateDisplayedPhotos();
@@ -163,18 +191,21 @@ public class MainActivity extends FragmentActivity implements
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-		/* (non-Javadoc)
-		 * @see android.support.v4.view.PagerAdapter#getItemPosition(java.lang.Object)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * android.support.v4.view.PagerAdapter#getItemPosition(java.lang.Object
+		 * )
 		 */
 		@Override
 		public int getItemPosition(Object object) {
-			// TODO Auto-generated method stub
-			if(object instanceof ImageCaptureFragment && 
-					fragments.get(1) instanceof ImageUploadFragment){
+			if (object instanceof ImageCaptureFragment
+					&& fragments.get(1) instanceof ImageUploadFragment) {
 				return POSITION_NONE;
 			}
-			if(object instanceof ImageUploadFragment && 
-					fragments.get(1) instanceof ImageCaptureFragment){
+			if (object instanceof ImageUploadFragment
+					&& fragments.get(1) instanceof ImageCaptureFragment) {
 				return POSITION_NONE;
 			}
 			return POSITION_UNCHANGED;
@@ -183,28 +214,29 @@ public class MainActivity extends FragmentActivity implements
 		private List<Fragment> fragments;
 		private FragmentManager fm;
 		private MyCaptureFragmentListener listener = new MyCaptureFragmentListener();
-		private final class MyCaptureFragmentListener implements CaptureFragmentListener{
+
+		private final class MyCaptureFragmentListener implements
+				CaptureFragmentListener {
 
 			@Override
 			public void onSwitchToUpload(byte[] data, double[] loc, String path) {
-				// TODO Auto-generated method stub
 				fm.beginTransaction().remove(fragments.get(1)).commit();
-				if(fragments.get(1) instanceof ImageCaptureFragment){
+				if (fragments.get(1) instanceof ImageCaptureFragment) {
 					ImageUploadFragment myUploadFragment;
-					myUploadFragment = ImageUploadFragment.newInstance(data, loc, path);
+					myUploadFragment = ImageUploadFragment.newInstance(data,
+							loc, path);
 					myUploadFragment.setListener(listener);
 					fragments.set(1, myUploadFragment);
 					notifyDataSetChanged();
 					startUpdate(mViewPager);
 				}
-				
+
 			}
 
 			@Override
 			public void onSwitchToCapture() {
-				// TODO Auto-generated method stub
 				fm.beginTransaction().remove(fragments.get(1)).commit();
-				if(fragments.get(1) instanceof ImageUploadFragment){
+				if (fragments.get(1) instanceof ImageUploadFragment) {
 					ImageCaptureFragment myCptFragment = new ImageCaptureFragment();
 					myCptFragment.setListener(listener);
 					fragments.set(1, myCptFragment);
@@ -213,6 +245,7 @@ public class MainActivity extends FragmentActivity implements
 				}
 			}
 		}
+
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 			this.fm = fm;
@@ -222,10 +255,11 @@ public class MainActivity extends FragmentActivity implements
 			super(fm);
 			this.fragments = fragments;
 			this.fm = fm;
-			if(this.fragments.get(1) instanceof ImageCaptureFragment){
-				ImageCaptureFragment myCaptureFragment = (ImageCaptureFragment) this.fragments.get(1);
+			if (this.fragments.get(1) instanceof ImageCaptureFragment) {
+				ImageCaptureFragment myCaptureFragment = (ImageCaptureFragment) this.fragments
+						.get(1);
 				myCaptureFragment.setListener(listener);
-				//this.fragments.set(1, myCaptureFragment);
+				// this.fragments.set(1, myCaptureFragment);
 			}
 		}
 
@@ -267,7 +301,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 			return null;
 		}
-		
+
 	}
 
 	public FlickrUser getFlickrUser() {
@@ -285,8 +319,6 @@ public class MainActivity extends FragmentActivity implements
 	public void setFlickr(Flickr flickr) {
 		this.flickr = flickr;
 	}
-	
-	
 
 	public AccessToken getPxUser() {
 		return pxUser;
@@ -295,8 +327,30 @@ public class MainActivity extends FragmentActivity implements
 	public void setPxUser(AccessToken pxUser) {
 		this.pxUser = pxUser;
 	}
-	
-	
+
+	public Double getLat() {
+		return lat;
+	}
+
+	public void setLat(Double lat) {
+		this.lat = lat;
+	}
+
+	public Double getLng() {
+		return lng;
+	}
+
+	public void setLng(Double lng) {
+		this.lng = lng;
+	}
+
+	public SeenItLocation getLoc() {
+		return loc;
+	}
+
+	public void setLoc(SeenItLocation loc) {
+		this.loc = loc;
+	}
 
 	/**
 	 * Interface with FlickrLoginDialog
@@ -320,9 +374,49 @@ public class MainActivity extends FragmentActivity implements
 	public void onPxLoggedIn(AccessToken user) {
 		System.out.println("500 px User logged in!");
 		this.pxUser = user;
-		
-		//Update info in settings fragment
+
+		// Update info in settings fragment
 		settingsFragment.updateUserInfo();
+	}
+
+	public SettingsFragment getSettingsFragment() {
+		return settingsFragment;
+	}
+
+	public void setSettingsFragment(SettingsFragment settingsFragment) {
+		this.settingsFragment = settingsFragment;
+	}
+
+	public Double getRadius() {
+		return radius;
+	}
+
+	public void setRadius(Double radius) {
+		this.radius = radius;
+	}
+
+	public ArrayList<String> getUrls() {
+		return urls;
+	}
+
+	public void setUrls(ArrayList<String> urls) {
+		this.urls = urls;
+	}
+
+	public Calendar getImgsAfter() {
+		return imgsAfter;
+	}
+
+	public void setImgsAfter(Calendar imgsAfter) {
+		this.imgsAfter = imgsAfter;
+	}
+
+	public Calendar getImgsBefore() {
+		return imgsBefore;
+	}
+
+	public void setImgsBefore(Calendar imgsBefore) {
+		this.imgsBefore = imgsBefore;
 	}
 
 }

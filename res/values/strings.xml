@@ -29,14 +29,13 @@
     <string name="settings_flickr_label">Flickr:</string>
     <string name="settings_500px_label">500px:</string>
     <string name="settings_not_logged_in">Not Logged In</string>
+
     <string-array name="SearchDiameters">
-        <item>5 meters</item>
-        <item>10 meters</item>
-        <item>15 meters</item>
-        <item>20 meters</item>
-        <item>25 meters</item>
+        <item>1 km</item>
+        <item>3 km</item>
+        <item>5 km</item>
     </string-array>
-    
+
     <color name="background_colour">#6D89D5</color>
     <color name="white">#FFFFFF</color>
 

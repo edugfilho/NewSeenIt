@@ -10,8 +10,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical" 
-        android:background="@color/white">
+        android:background="@color/white"
+        android:orientation="vertical" >
 
         <LinearLayout
             android:id="@+id/linearLayout1"
@@ -40,24 +40,32 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="0.21"
                     android:text="@string/settings_after_label"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <EditText
-                    android:id="@+id/editText1"
-                    android:layout_width="0dp"
+                <Button
+                    android:id="@+id/btnSelectAfter"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="date" />
+                    android:paddingRight="10dp"
+                    android:text="Select date..." />
+
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/textDateImgAfter"
+                android:layout_width="124dp"
+                android:layout_height="wrap_content"
+                android:text="11/11/2008"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <LinearLayout
                 android:layout_width="fill_parent"
@@ -67,24 +75,33 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="0.47"
                     android:text="@string/settings_before_label"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <EditText
-                    android:id="@+id/editText2"
-                    android:layout_width="0dp"
+                <Button
+                    android:id="@+id/btnSelectBefore"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:inputType="date" />
+                    android:paddingRight="10dp"
+                    android:text="Select date..." />
+
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/textDateImgBefore"
+                android:layout_width="124dp"
+                android:layout_height="wrap_content"
+                android:text="21/05/2045"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="10dp" >
+            android:layout_margin="10dp"
+            android:orientation="vertical" >
 
             <RelativeLayout
                 android:layout_width="fill_parent"
@@ -148,7 +165,6 @@
                     android:src="@android:drawable/ic_menu_edit" />
             </RelativeLayout>
         </LinearLayout>
-
     </LinearLayout>
 
 </RelativeLayout>

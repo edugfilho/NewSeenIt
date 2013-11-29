@@ -1,7 +1,10 @@
 package com.example.mobileseenit;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,68 +15,127 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.mobileseenit.SeenItLocation.LocationResult;
+import com.example.mobileseenit.apis.FlickrSearchTask;
+import com.example.mobileseenit.apis.PxSearchTask;
 import com.example.mobileseenit.helpers.PhotoStreamImageView;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 
-public class MainFragment extends Fragment implements OnTouchListener,  OnClickListener{
+public class MainFragment extends Fragment implements OnTouchListener,
+		OnClickListener {
 
-	ArrayList<PhotoWrapper> photos= null;
-	
+	ArrayList<PhotoWrapper> photos = null;
+	PxSearchTask pxSearchTask;
+	FlickrSearchTask flickrSearch;
+	MainActivity mainActivity;
+
+	LocationResult locationResult = new LocationResult() {
+		@Override
+		public void gotLocation(Location location) {
+
+			// It's called only when the location is changed. Now that it has
+			// new
+			// lat and lng, it can search for new photos
+
+			mainActivity.setLat(location.getLatitude());
+			mainActivity.setLng(location.getLongitude());
+
+			mainActivity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+
+					// if (mainActivity.getPhotoList().isEmpty()) {
+					Toast.makeText(mainActivity.getApplicationContext(),
+							"Location acquired. Displaying pictures",
+							Toast.LENGTH_SHORT).show();
+
+					flickrSearch = new FlickrSearchTask(getActivity());
+					flickrSearch.execute();
+
+					// Search 500px Images
+					 pxSearchTask = new PxSearchTask(getActivity());
+					 pxSearchTask.execute("search");
+
+				}
+			});
+
+		}
+
+	};
+
+	public void updateDisplayedPhotos() {
+		// Hide progress spinner
+		ProgressBar progressBar = (ProgressBar) getView().findViewById(
+				R.id.photo_load_progress_bar);
+		progressBar.setVisibility(View.GONE);
+
+		// Display images
+		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
+		for (PhotoWrapper p : photos) {
+
+			LinearLayout r = (LinearLayout) getView().findViewById(
+					R.id.photo_stream);
+			PhotoStreamImageView newImage = new PhotoStreamImageView(
+					getActivity(), p);
+			r.addView(newImage);
+		}
+
+	}
+
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
-		View rootView = inflater.inflate(R.layout.fragment_main,
-				container, false);
-		
-		//Display images
-		MainActivity mainActivity = (MainActivity) getActivity();
-		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
-		if(photos != null && photos.size() > 0 )
-		{
-			//Hide progress spinner
-			ProgressBar progressBar = (ProgressBar)rootView.findViewById(R.id.photo_load_progress_bar);
-			progressBar.setVisibility(View.GONE);
-			
-			for (PhotoWrapper p : photos ) {
 
-				LinearLayout r = (LinearLayout) rootView.findViewById(R.id.photo_stream);
-				PhotoStreamImageView newImage = new PhotoStreamImageView(getActivity(), p);
-				r.addView(newImage);
-			}
-		}
-				
+		View rootView = inflater.inflate(R.layout.fragment_main, container,
+				false);
+
+		mainActivity = (MainActivity) getActivity();
+
+		Toast.makeText(getActivity(), "CreateView", Toast.LENGTH_SHORT).show();
 		return rootView;
-	}
-	
-	public void updateDisplayedPhotos()
-	{
-		//Hide progress spinner
-		ProgressBar progressBar = (ProgressBar)getView().findViewById(R.id.photo_load_progress_bar);
-		progressBar.setVisibility(View.GONE);
-		
-		//Display images
-		MainActivity mainActivity = (MainActivity) getActivity();
-		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
-		for (PhotoWrapper p : photos ) {
-
-			LinearLayout r = (LinearLayout) getView().findViewById(R.id.photo_stream);
-			PhotoStreamImageView newImage = new PhotoStreamImageView(getActivity(), p);
-			r.addView(newImage);
-		}
-			
 	}
 
 	@Override
 	public void onClick(View v) {
-		
+
 	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void onPause() {
+		// Stops any location request
+		/*
+		 * mainActivity.getLoc().getLocationManager()
+		 * .removeUpdates(mainActivity.getLoc().locationListenerGps);
+		 */
+		super.onPause();
+	}
+
+	@Override
+	public void onStop() {
+		// Stops any location request
+		mainActivity.getLoc().getLocationManager()
+				.removeUpdates(mainActivity.getLoc().locationListenerGps);
+		super.onPause();
+	}
+
+	@Override
+	public void onResume() {
+
+		mainActivity.getLoc().getLocation(getActivity(), locationResult);
+
+		Toast.makeText(getActivity(), "Getting location...", Toast.LENGTH_SHORT)
+				.show();
+
+		super.onResume();
 	}
 
 }

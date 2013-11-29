@@ -41,7 +41,7 @@ public class PhotoUploadTestFragment extends Fragment implements
 	@Override
 	public void onClick(View v) {
 		if (v.getId() == R.id.upload_test_button) {
-			
+
 			System.out.println();
 			HashMap<String,String> meta = new HashMap<String,String>();
 			meta.put("description", "testDescription");
@@ -53,7 +53,7 @@ public class PhotoUploadTestFragment extends Fragment implements
 
 			InputStream in;
 			try {
-				in =getResources().openRawResource(R.raw.llama_613_600x450) ;
+				in = getResources().openRawResource(R.raw.llama_613_600x450);
 				int i;
 				byte[] buffer = new byte[1024];
 				while ((i = in.read(buffer)) != -1) {
@@ -70,12 +70,11 @@ public class PhotoUploadTestFragment extends Fragment implements
 			}
 
 			byte data[] = out.toByteArray();
-			
+
 			PxUploadKeyTask t = new PxUploadKeyTask(data, meta, this.getActivity());
 			t.execute("");
 			//FlickrUploadTask t = new FlickrUploadTask(f,data, uploadMetaData, this.getActivity());
-			//t.execute("");
-			
+			// t.execute("");
 
 		}
 

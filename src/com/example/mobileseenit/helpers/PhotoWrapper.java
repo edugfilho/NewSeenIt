@@ -36,8 +36,7 @@ public class PhotoWrapper {
 			detailMap = processFlickr(rawPhoto);
 		} else if (type.equals(INSTAGRAM_OBJECT)) {
 			detailMap = processInstagrm(rawPhoto);
-		}
-		else if(type.equals(PX_OBJECT)){
+		} else if (type.equals(PX_OBJECT)) {
 			detailMap = processPx(rawPhoto);
 		}
 	}
@@ -63,27 +62,27 @@ public class PhotoWrapper {
 
 		return details;
 	}
-	
-	//Convert 500px json object to fields
-	private HashMap<String, String> processPx(Object o){
-		
-		//Grab the object
+
+	// Convert 500px json object to fields
+	private HashMap<String, String> processPx(Object o) {
+
+		// Grab the object
 		JSONObject jsonPhoto = (JSONObject) o;
-		HashMap<String,String> details = new HashMap<String,String>();
-		
+		HashMap<String, String> details = new HashMap<String, String>();
+
 		try {
-			details.put(TITLE_FIELD, jsonPhoto.getString("description") );
+			details.put(TITLE_FIELD, jsonPhoto.getString("description"));
 			details.put(LINK_FIELD, jsonPhoto.getString("image_url"));
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return details;
-		
+
 	}
 
-	//Access Methods
+	// Access Methods
 	public Bitmap getBitmap() {
 		return bitmap;
 	}

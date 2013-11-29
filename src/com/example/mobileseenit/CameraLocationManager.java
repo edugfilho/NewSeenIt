@@ -43,7 +43,7 @@ public class CameraLocationManager {
 		}
 		try{
 			mLocationManager.requestLocationUpdates
-			(LocationManager.GPS_PROVIDER, 2000, 0, mLocationListeners[0]);
+			(LocationManager.GPS_PROVIDER, 360000, 0, mLocationListeners[0]);
 		} catch (Exception ex){
 			Log.d("exception", null, ex);
 		}

@@ -78,7 +78,7 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 						instaAdapter.add(entry.getValue());
 					}
 
-					//setText("Location: lat: " + lat + " lng: " + lng);
+					// setText("Location: lat: " + lat + " lng: " + lng);
 					Toast.makeText(getActivity(), "Location acquired",
 							Toast.LENGTH_SHORT).show();
 				}
@@ -119,7 +119,7 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 
 	@Override
 	public void onResume() {
-		if (loc.gps_enabled) {
+		/*if (loc.gps_enabled) {
 			loc.getLocationManager().requestLocationUpdates(
 					LocationManager.GPS_PROVIDER,
 					loc.getUpdateIntervalTimeMilisec(), 1000,
@@ -127,7 +127,7 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 			Toast.makeText(getActivity(), "Getting location...",
 					Toast.LENGTH_SHORT).show();
 
-		}
+		}*/
 		super.onResume();
 	}
 
@@ -239,13 +239,11 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 			FragmentTransaction ft = getActivity().getFragmentManager()
 					.beginTransaction();
 
-			/*TODO ?
-			 * ImageDialogSeenIt newFragment = ImageDialogSeenIt
+			ImageDialogSeenIt newFragment = ImageDialogSeenIt
 					.newInstance(imgUrl);
 
-		//	ImageDialogSeenIt newFragment = ImageDialogSeenIt.newInstance(imgUrl);
-*/
-			//newFragment.show(ft, "dialog");
+
+			newFragment.show(ft, "dialog");
 		}
 
 		private class Row extends ArrayList {
