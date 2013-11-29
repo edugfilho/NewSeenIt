@@ -4,8 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,9 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.uploader.UploadMetaData;
-import com.aetrion.flickr.uploader.Uploader;
-import com.example.mobileseenit.apis.FlickrUploadTask;
+import com.example.mobileseenit.apis.PxUploadKeyTask;
 
 public class PhotoUploadTestFragment extends Fragment implements
 		OnTouchListener, OnClickListener {
@@ -44,12 +42,11 @@ public class PhotoUploadTestFragment extends Fragment implements
 	public void onClick(View v) {
 		if (v.getId() == R.id.upload_test_button) {
 			
-			f = ((MainActivity) getActivity()).getFlickr();
 			System.out.println();
-			UploadMetaData uploadMetaData = new UploadMetaData();
-			uploadMetaData.setTitle("hello Dylan");
-
-			Uploader u = f.getUploader();
+			HashMap<String,String> meta = new HashMap<String,String>();
+			meta.put("description", "testDescription");
+			meta.put("name", "testName");
+			meta.put("category", "0");
 
 			// Get data into stream
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -74,6 +71,8 @@ public class PhotoUploadTestFragment extends Fragment implements
 
 			byte data[] = out.toByteArray();
 			
+			PxUploadKeyTask t = new PxUploadKeyTask(data, meta, this.getActivity());
+			t.execute("");
 			//FlickrUploadTask t = new FlickrUploadTask(f,data, uploadMetaData, this.getActivity());
 			//t.execute("");
 			
