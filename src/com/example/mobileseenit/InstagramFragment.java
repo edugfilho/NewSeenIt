@@ -239,11 +239,11 @@ public class InstagramFragment extends Fragment implements OnTouchListener,
 			FragmentTransaction ft = getActivity().getFragmentManager()
 					.beginTransaction();
 
-			ImageDialogSeenIt newFragment = ImageDialogSeenIt
-					.newInstance(imgUrl);
+			//ImageDialogSeenIt newFragment = ImageDialogSeenIt
+			//		.newInstance(imgUrl);
 
 
-			newFragment.show(ft, "dialog");
+		//	newFragment.show(ft, "dialog");
 		}
 
 		private class Row extends ArrayList {

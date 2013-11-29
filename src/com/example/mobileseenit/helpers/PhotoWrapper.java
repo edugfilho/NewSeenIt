@@ -35,7 +35,7 @@ public class PhotoWrapper {
 		if (type.equals(FLICKR_OBJECT)) {
 			detailMap = processFlickr(rawPhoto);
 		} else if (type.equals(INSTAGRAM_OBJECT)) {
-			detailMap = processInstagrm(rawPhoto);
+			detailMap = processInstagrm(rawPhoto); 
 		} else if (type.equals(PX_OBJECT)) {
 			detailMap = processPx(rawPhoto);
 		}
