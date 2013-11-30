@@ -30,6 +30,8 @@ import com.fivehundredpx.api.auth.AccessToken;
 public class SettingsFragment extends Fragment implements OnTouchListener,
 		OnClickListener {
 
+	
+
 	// Login Dialogs
 	FlickrLoginDialog flickrLoginDialog;
 
@@ -187,7 +189,7 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 				});
 		return v;
 	}
-
+	
 	private void initializeDateValues() {
 		Calendar cal = mainActivity.getImgsAfter();
 		dateImgAfter
@@ -267,6 +269,7 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 					R.id.flickr_username);
 			usernameTextView.setText(flickrUser.getUsername());
 		}
+		updateUserInfo();
 	}
 
 	@Override

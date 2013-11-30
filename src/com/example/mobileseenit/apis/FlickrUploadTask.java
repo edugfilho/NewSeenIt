@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.RequestContext;
+import com.aetrion.flickr.photos.GeoData;
 import com.aetrion.flickr.uploader.UploadMetaData;
 
 /**
@@ -26,6 +27,7 @@ public class FlickrUploadTask extends AsyncTask<String, Void, String> {
 	// Flickrj object
 	Flickr f;
 	Context context;
+	GeoData location;
 
 	/*
 	 * (non-Javadoc)
@@ -39,11 +41,14 @@ public class FlickrUploadTask extends AsyncTask<String, Void, String> {
 		if (result != null) {
 			if (result.equals("loginError")) {
 				Toast.makeText(context,
-						"Upload failed: User not logged in or login failed!",
+						"Flickr upload failed: User not logged in or login failed!",
 						Toast.LENGTH_LONG).show();
-			} else
-				Toast.makeText(context, "Upload successful!", Toast.LENGTH_LONG)
+			} else{
+				Toast.makeText(context, "Flickr upload successful!", Toast.LENGTH_LONG)
 						.show();
+				FlickrSetLocationTask f = new FlickrSetLocationTask(location,context,result);
+				f.execute("");
+			}
 		}
 	}
 
@@ -68,11 +73,12 @@ public class FlickrUploadTask extends AsyncTask<String, Void, String> {
 	 *            - meta data about the photo.
 	 */
 	public FlickrUploadTask(Flickr flickrObject, byte data[],
-			UploadMetaData metaData, Context context) {
+			UploadMetaData metaData, Context context, GeoData location) {
 		this.data = data;
 		this.meta = metaData;
 		this.f = flickrObject;
 		this.context = context;
+		this.location = location;
 	}
 
 	@Override

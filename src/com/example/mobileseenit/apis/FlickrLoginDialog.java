@@ -70,7 +70,7 @@ public class FlickrLoginDialog extends DialogFragment {
 		try {
 
 			// Check the Auth, build a FlickrUser
-			FlickrTestAuthTask lol = new FlickrTestAuthTask(this, authInterface);
+			FlickrTestAuthTask lol = new FlickrTestAuthTask(this, authInterface, this.getActivity());
 			lol.execute(frob);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -87,6 +87,7 @@ public class FlickrLoginDialog extends DialogFragment {
 	// Container Activity must implement this interface
 	public interface OnFlickrLoggedInListener {
 		public void onFlickLoggedIn(FlickrUser user);
+		public void onFlickrAuthRetrieved(FlickrUser user);
 	}
 
 	public interface OnUpdateFlickrListener {

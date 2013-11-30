@@ -1,8 +1,12 @@
 package com.example.mobileseenit;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -26,8 +30,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.photos.GeoData;
 import com.aetrion.flickr.uploader.UploadMetaData;
 import com.example.mobileseenit.apis.FlickrUploadTask;
+import com.example.mobileseenit.apis.PxUploadKeyTask;
 
 public class ImageUploadFragment extends Fragment implements OnClickListener {
 	private CaptureFragmentListener listener;
@@ -138,13 +144,25 @@ public class ImageUploadFragment extends Fragment implements OnClickListener {
 		UploadMetaData uploadMetaData = new UploadMetaData();
 		uploadMetaData.setTitle(title.getText().toString());
 		uploadMetaData.setDescription(description.getText().toString());
-		FlickrUploadTask t = new FlickrUploadTask(f,data,uploadMetaData,this.getActivity());
+		GeoData geodata = new GeoData();
+		geodata.setAccuracy(16);
+		geodata.setLatitude((float) lat);
+		geodata.setLongitude((float) lon);
+		FlickrUploadTask t = new FlickrUploadTask(f,data,uploadMetaData,this.getActivity(), geodata);
 		t.execute("");
 	}
 	private void uploadTo500px(){
 		
 		//Place your uploadTo500px code here.
+		List<NameValuePair> param = new ArrayList<NameValuePair>();
+		param.add(new BasicNameValuePair("latitude",Double.toString(lat)));
+		param.add(new BasicNameValuePair("longitude",Double.toString(lon)));
+		param.add(new BasicNameValuePair("name", title.getText().toString()));
+		param.add(new BasicNameValuePair("description",description.getText().toString()));
+		param.add(new BasicNameValuePair("privacy",Double.toString(1)));
 		
+		PxUploadKeyTask p = new PxUploadKeyTask(param, this.getActivity(),path);
+		p.execute("");
 		
 	}
 	
