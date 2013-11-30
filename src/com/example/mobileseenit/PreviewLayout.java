@@ -11,6 +11,7 @@ public class PreviewLayout extends FrameLayout {
 		super(context, attrs);
 		// TODO Auto-generated constructor stub
 	}
+	
 	public void setRatio(double nRatio){
 		ratio = 1/nRatio;
 		requestLayout();
@@ -20,11 +21,7 @@ public class PreviewLayout extends FrameLayout {
 		// TODO Auto-generated method stub
 		int width = MeasureSpec.getSize(widthMeasureSpec);
 		int height = MeasureSpec.getSize(heightMeasureSpec);
-		if (width > height * ratio) {
-				width = (int) (height * ratio + .5);
-		} else {
-			height = (int) (width / ratio + .5);
-		}
+		height = (int) (width / ratio + .5);
 		super.onMeasure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
 				MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
 	}

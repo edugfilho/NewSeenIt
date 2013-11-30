@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
@@ -37,11 +40,13 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 	AuthInterface a;
 	MainActivity mainActivity;
 	Auth auth;
+	Context context;
 
-	public FlickrTestAuthTask(FlickrLoginDialog gg, AuthInterface a) {
+	public FlickrTestAuthTask(FlickrLoginDialog gg, AuthInterface a, Context context) {
 
 		fragment = gg;
 		mainActivity = (MainActivity) gg.getActivity();
+		this.context = context;
 
 		f = mainActivity.getFlickr();
 		this.a = f.getAuthInterface();
@@ -90,7 +95,10 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 		// Set stuff
 		FlickrUser newUser = new FlickrUser();
 		newUser.setUsername(auth.getUser().getUsername());
-
+		
+		SharedPreferences sp = context.getSharedPreferences("seenit_prefs", 0);
+		sp.edit().putString("flickr_token", auth.getToken()).commit();
+		
 		fragment.updateFlickr(f, "");
 		fragment.acceptFlickrUser(newUser);
 		System.out.println();

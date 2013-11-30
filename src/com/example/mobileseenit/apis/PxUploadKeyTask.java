@@ -1,10 +1,15 @@
 package com.example.mobileseenit.apis;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.NameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
@@ -17,70 +22,59 @@ import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
 import com.aetrion.flickr.RequestContext;
 import com.aetrion.flickr.uploader.UploadMetaData;
+import com.example.mobileseenit.MainActivity;
+import com.example.mobileseenit.R;
+import com.fivehundredpx.api.PxApi;
 /**
 
- * @author dylanrunkel
+ * @author dylanrunkel & YixuanLi
  * 
  */
-public class PxUploadKeyTask extends AsyncTask<String, Void, String>{
+public class PxUploadKeyTask extends AsyncTask<String, Void, JSONObject>{
 
 
 	Context context;
+	String path;
+	List<NameValuePair> param;
+	Flickr f;
+	PxApi pxApi;
 
 	
 	@Override
-	protected void onPostExecute(String result) {
+	protected void onPostExecute(JSONObject result) {
 		// TODO Auto-generated method stub
 		super.onPostExecute(result);
-		if(result!=null){
-			if(result.equals("loginError")){
-				Toast.makeText(context, "Upload failed: User not logged in or login failed!",
-					     Toast.LENGTH_LONG).show();
+		if(result!=null&&!result.isNull("upload_key")){
+			try {
+				String key = result.getString("upload_key");
+				JSONObject photo = result.getJSONObject("photo");
+				String id = ""+photo.getInt("id");
+				
+				PxUploadTask p = new PxUploadTask(path,context,id,key);
+				p.execute("");
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			else
-				Toast.makeText(context, "Upload successful!",
-					     Toast.LENGTH_LONG).show();
 		}
 	}
 
-	// Data array of photo (done in fragment before calling)
-	byte data[];
-
-	// Any metadata (title etc) added to the image. Done in fragment.
-	UploadMetaData meta;
-
-	// Required for upload request
-	RequestContext requestContext;
-
-
-	public PxUploadKeyTask(Flickr flickrObject, byte data[],
-			UploadMetaData metaData, Context context) {
-		this.data = data;
-		this.meta = metaData;
+	public PxUploadKeyTask(List<NameValuePair> param, Context context,
+			String path) {
+		this.param = param;
+		this.path = path;
 		this.context = context;
-	}
-
-	public PxUploadKeyTask(byte[] data2, HashMap<String, String> meta2,
-			FragmentActivity activity) {
-		// TODO Auto-generated constructor stub
+		f = ((MainActivity)this.context).getFlickr();
+		pxApi = new PxApi(((MainActivity)this.context).getPxToken(),
+				context.getString(R.string.px_consumer_key),
+				context.getString(R.string.px_consumer_secret));
+		
 	}
 
 	@Override
-	protected String doInBackground(String... params) {
-		try {
-			return upload(params);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-
-	public String upload(String... searchTerms) throws IOException,
-			SAXException, ParserConfigurationException {
-
-		requestContext = RequestContext.getRequestContext();
-		return null;
+	protected JSONObject doInBackground(String... params) {
+		JSONObject obj = pxApi.post("/photos", param);
+		return obj;
 	}
 
 }
