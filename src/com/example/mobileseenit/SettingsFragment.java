@@ -1,7 +1,6 @@
 package com.example.mobileseenit;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.StringTokenizer;
 
 import android.app.Dialog;
@@ -16,11 +15,12 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.mobileseenit.apis.FlickrLoginDialog;
 import com.example.mobileseenit.apis.FlickrUser;
@@ -29,8 +29,6 @@ import com.fivehundredpx.api.auth.AccessToken;
 
 public class SettingsFragment extends Fragment implements OnTouchListener,
 		OnClickListener {
-
-	
 
 	// Login Dialogs
 	FlickrLoginDialog flickrLoginDialog;
@@ -43,6 +41,8 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 	Button selectAfter;
 	Button selectBefore;
 	Button set;
+	TextView beforeLabel;
+	TextView afterLabel;
 
 	DatePicker datePicker;
 
@@ -54,23 +54,23 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		// setup
 		View v = inflater.inflate(R.layout.fragment_settings, container, false);
+		mainActivity = (MainActivity) getActivity();
 
 		// Set Add Flickr Account button click handler
 		ImageButton flickrButton = (ImageButton) v
 				.findViewById(R.id.add_flickr_account_button);
 		flickrButton.setOnClickListener(this);
 
-		mainActivity = (MainActivity) getActivity();
-
 		// Set date pickers after & before
 		selectAfter = (Button) v.findViewById(R.id.btnSelectAfter);
 		selectBefore = (Button) v.findViewById(R.id.btnSelectBefore);
 		datePicker = (DatePicker) v.findViewById(R.id.datePicker);
-
-
 		dateImgAfter = (TextView) v.findViewById(R.id.textDateImgAfter);
 		dateImgBefore = (TextView) v.findViewById(R.id.textDateImgBefore);
+		afterLabel = (TextView)v.findViewById(R.id.settings_after_label);
+		beforeLabel = (TextView)v.findViewById(R.id.settings_before_label);
 		initializeDateValues();
 
 		// Set dateAfter listener
@@ -131,7 +131,7 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 
 						// Update dates in text format
 						updateDateValues(dateImgBefore);
-						
+
 						picker.dismiss();
 					}
 				});
@@ -139,6 +139,20 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 
 			}
 		});
+
+		// Set checkbox onclick listener
+		final CheckBox useDateRange = (CheckBox) v.findViewById(R.id.checkBox1);
+
+		useDateRange.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				toggleChecked(useDateRange.isChecked());
+			}
+		});
+
+		// Check if user has selected to use date range
+		toggleChecked(mainActivity.useDateRange);
 
 		// Set Add 500px Account button click handler
 		ImageButton pxButton = (ImageButton) v
@@ -189,7 +203,7 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 				});
 		return v;
 	}
-	
+
 	private void initializeDateValues() {
 		Calendar cal = mainActivity.getImgsAfter();
 		dateImgAfter
@@ -270,6 +284,26 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 			usernameTextView.setText(flickrUser.getUsername());
 		}
 		updateUserInfo();
+	}
+
+	private void toggleChecked(boolean checked) {
+		//Convert to int for visible
+		int visible;
+		if(checked)
+			visible = View.VISIBLE;
+		else
+			visible = View.INVISIBLE;
+		
+		// If checked, enable date fields
+		selectAfter.setVisibility(visible);
+		selectBefore.setVisibility(visible);
+		dateImgAfter.setVisibility(visible);
+		dateImgBefore.setVisibility(visible);
+		afterLabel.setVisibility(visible);
+		beforeLabel.setVisibility(visible);
+		
+		//save in MainActivity for later
+		mainActivity.setUseDateRange(checked);
 	}
 
 	@Override

@@ -2,11 +2,7 @@ package com.example.mobileseenit.apis;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,7 +12,6 @@ import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
-import com.aetrion.flickr.REST;
 import com.aetrion.flickr.photos.Photo;
 import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
@@ -24,16 +19,18 @@ import com.aetrion.flickr.photos.SearchParameters;
 import com.example.mobileseenit.MainActivity;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 
+/**
+ * Async task to search Flickr for images based on the current location.
+ * 
+ * Uses the FlickrJ library.
+ * 
+ * @author dylanrunkel
+ * 
+ */
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 	// Number of images to load at once.
-	private static final int LOAD_COUNT = 10;
-
-	// API key
-	private static final String API_KEY = "af76271af34e193bd2f002eb32032e01";
-
-	// Secret Key
-	private static final String SECRET_KEY = "b7b96e8ab7032484";
+	private static final int LOAD_COUNT = 4;
 
 	// Reference to the calling fragment (flickr)
 	private MainActivity g;
@@ -45,18 +42,16 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	private LinkedList<PhotoWrapper> photos;
 
 	public FlickrSearchTask(Activity g) {
-
+		// get ref to Main Activity
 		this.g = (MainActivity) g;
 
-	
-			f = this.g.getFlickr();
+		// Take the shared flickr object
+		f = this.g.getFlickr();
 	}
-	
 
+	// Async task - call the method to run.
 	@Override
 	protected String doInBackground(String... searchTerms) {
-
-		// params comes from the execute() call. Will be the search terms.
 		try {
 			return search(searchTerms);
 		} catch (IOException e) {
@@ -82,16 +77,16 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		searchParams.setHasGeo(true);
 		searchParams.setLatitude(g.getLat().toString());
 		searchParams.setLongitude(g.getLng().toString());
 		searchParams.setRadius(g.getRadius().intValue());
 		searchParams.setRadiusUnits("km");
-	//	searchParams.setMinTakenDate(g.getImgsAfter()
-	//			.getTime());
-	//	searchParams.setMaxTakenDate(g.getImgsBefore()
-		//		.getTime());
+		if (g.useDateRange) {
+			searchParams.setMinTakenDate(g.getImgsAfter().getTime());
+			searchParams.setMaxTakenDate(g.getImgsBefore().getTime());
+		}
 
 		// Initialize PhotosInterface object
 		PhotosInterface photosInterface = f.getPhotosInterface();

@@ -64,6 +64,7 @@ public class MainActivity extends FragmentActivity implements
 	SeenItLocation loc;
 
 	// Settings
+	public boolean useDateRange;
 	public Calendar imgsAfter;
 	public Calendar imgsBefore;
 	
@@ -96,6 +97,9 @@ public class MainActivity extends FragmentActivity implements
 
 		}
 
+		//Default date range to false
+		useDateRange = false;
+		
 		// Set settings default values
 		imgsAfter = Calendar.getInstance();
 		// imgsAfter.set(Calendar.YEAR, 1990);
@@ -459,5 +463,15 @@ public class MainActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 		this.flickrUser = user;
 	}
+
+	public boolean isUseDateRange() {
+		return useDateRange;
+	}
+
+	public void setUseDateRange(boolean useDateRange) {
+		this.useDateRange = useDateRange;
+	}
+	
+	
 
 }
