@@ -48,14 +48,10 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 		this.g = (MainActivity) g;
 
-		// Setup flickrJ object
-		try {
-			f = new Flickr(API_KEY, SECRET_KEY, new REST());
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+			f = this.g.getFlickr();
 	}
+	
 
 	@Override
 	protected String doInBackground(String... searchTerms) {
@@ -79,8 +75,6 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		SearchParameters searchParams = new SearchParameters();
 		searchParams.setSort(SearchParameters.INTERESTINGNESS_DESC);
 
-		// Create tag keyword array
-		String[] tags = new String[] { "Dog", "Beagle" };
 		// searchParams.setTags(tags);
 		try {
 			searchParams.setMedia("photos");
@@ -88,15 +82,16 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 		searchParams.setHasGeo(true);
 		searchParams.setLatitude(g.getLat().toString());
 		searchParams.setLongitude(g.getLng().toString());
 		searchParams.setRadius(g.getRadius().intValue());
 		searchParams.setRadiusUnits("km");
-		searchParams.setMinTakenDate(g.getImgsAfter()
-				.getTime());
-		searchParams.setMaxTakenDate(g.getImgsBefore()
-				.getTime());
+	//	searchParams.setMinTakenDate(g.getImgsAfter()
+	//			.getTime());
+	//	searchParams.setMaxTakenDate(g.getImgsBefore()
+		//		.getTime());
 
 		// Initialize PhotosInterface object
 		PhotosInterface photosInterface = f.getPhotosInterface();
