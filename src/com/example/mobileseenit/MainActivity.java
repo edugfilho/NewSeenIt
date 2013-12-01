@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
@@ -47,7 +45,6 @@ public class MainActivity extends FragmentActivity implements
 	// Fragments
 	MainFragment mainFragment;
 	SettingsFragment settingsFragment;
-	PhotoUploadTestFragment uploadTestFragment;
 
 	// user objects
 	FlickrUser flickrUser;
@@ -108,12 +105,10 @@ public class MainActivity extends FragmentActivity implements
 		// Add your fragments here
 		mainFragment = new MainFragment();
 		settingsFragment = new SettingsFragment();
-		uploadTestFragment = new PhotoUploadTestFragment();
 		List<Fragment> fragments = new ArrayList<Fragment>();
 		fragments.add(mainFragment);
 		fragments.add(new ImageCaptureFragment());
 		fragments.add(settingsFragment);
-		fragments.add(uploadTestFragment);
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
@@ -287,7 +282,6 @@ public class MainActivity extends FragmentActivity implements
 				ImageCaptureFragment myCaptureFragment = (ImageCaptureFragment) this.fragments
 						.get(1);
 				myCaptureFragment.setListener(listener);
-				// this.fragments.set(1, myCaptureFragment);
 			}
 		}
 
@@ -296,25 +290,17 @@ public class MainActivity extends FragmentActivity implements
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-
-			// Fragment fragment = new DummySectionFragment();
-			// Bundle args = new Bundle();
-			// args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position +
-			// 1);
-			// fragment.setArguments(args);
-			System.out.println("position: " + position);
 			return fragments.get(position);
 		}
 
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 4;
+			return 3;
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
-			Locale l = Locale.getDefault();
 			switch (position) {
 			// TODO switch these back to R.String properties
 			case 0:
@@ -324,8 +310,6 @@ public class MainActivity extends FragmentActivity implements
 				return "Capture";
 			case 2:
 				return "Settings";
-			case 3:
-				return "Upload";
 			}
 			return null;
 		}
