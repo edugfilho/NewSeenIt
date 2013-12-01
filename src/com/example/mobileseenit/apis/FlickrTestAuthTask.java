@@ -41,8 +41,10 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 	MainActivity mainActivity;
 	Auth auth;
 	Context context;
+	boolean goodAuth;
 
-	public FlickrTestAuthTask(FlickrLoginDialog gg, AuthInterface a, Context context) {
+	public FlickrTestAuthTask(FlickrLoginDialog gg, AuthInterface a,
+			Context context) {
 
 		fragment = gg;
 		mainActivity = (MainActivity) gg.getActivity();
@@ -50,6 +52,7 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 
 		f = mainActivity.getFlickr();
 		this.a = f.getAuthInterface();
+		goodAuth = false;
 	}
 
 	@Override
@@ -62,7 +65,6 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 		return null;
 	}
 
-	
 	public String search(String... frobString) throws IOException,
 			SAXException, ParserConfigurationException {
 
@@ -80,6 +82,7 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 			System.out.println("Realname: " + auth.getUser().getRealName());
 			System.out.println("Username: " + auth.getUser().getUsername());
 			System.out.println("Permission: " + auth.getPermission().getType());
+			goodAuth = true;
 
 		} catch (FlickrException e) {
 			System.out.println("Authentication failed");
@@ -87,21 +90,23 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 		}
 
 		return "test";
-	}
+	} 
 
 	// onPostExecute displays the results of the AsyncTask.
 	@Override
 	protected void onPostExecute(String result) {
-		// Set stuff
-		FlickrUser newUser = new FlickrUser();
-		newUser.setUsername(auth.getUser().getUsername());
-		
-		SharedPreferences sp = context.getSharedPreferences("seenit_prefs", 0);
-		sp.edit().putString("flickr_token", auth.getToken()).commit();
-		
-		fragment.updateFlickr(f, "");
-		fragment.acceptFlickrUser(newUser);
-		System.out.println();
+		// Check if auth succeeded
+		if (goodAuth) {
+			FlickrUser newUser = new FlickrUser();
+			newUser.setUsername(auth.getUser().getUsername());
+
+			SharedPreferences sp = context.getSharedPreferences("seenit_prefs",
+					0);
+			sp.edit().putString("flickr_token", auth.getToken()).commit();
+
+			fragment.updateFlickr(f, "");
+			fragment.acceptFlickrUser(newUser);
+		}
 	}
 
 }

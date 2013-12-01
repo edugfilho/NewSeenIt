@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
@@ -20,8 +23,8 @@ import android.view.Menu;
 import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
+import com.aetrion.flickr.REST;
 import com.example.mobileseenit.apis.FlickrAuthRetrieveTask;
-import com.example.mobileseenit.apis.FlickrBuilder;
 import com.example.mobileseenit.apis.FlickrLoginDialog;
 import com.example.mobileseenit.apis.FlickrUser;
 import com.example.mobileseenit.apis.PxLoginDialog;
@@ -64,15 +67,15 @@ public class MainActivity extends FragmentActivity implements
 	public boolean useDateRange;
 	public Calendar imgsAfter;
 	public Calendar imgsBefore;
-	
-	//token
+
+	// token
 	String flickr_token;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+
 		SharedPreferences sp = this.getSharedPreferences("seenit_prefs", 0);
 
 		// Set up the action bar.
@@ -83,7 +86,6 @@ public class MainActivity extends FragmentActivity implements
 		loc = new SeenItLocation();
 		radius = 1.0; // default value, change for constant
 
-		
 		if (getLoc().gps_enabled) {
 			getLoc().getLocationManager().requestLocationUpdates(
 					LocationManager.GPS_PROVIDER,
@@ -94,9 +96,9 @@ public class MainActivity extends FragmentActivity implements
 
 		}
 
-		//Default date range to false
+		// Default date range to false
 		useDateRange = false;
-		
+
 		// Set settings default values
 		imgsAfter = Calendar.getInstance();
 		// imgsAfter.set(Calendar.YEAR, 1990);
@@ -141,21 +143,27 @@ public class MainActivity extends FragmentActivity implements
 		urls = new ArrayList<String>();
 
 		// Initialize Flickr Object
-		flickr = FlickrBuilder.buildFlickr();
-		
+		try {
+			String flickrApi = getString(R.string.flickr_api_key);
+			String flickrSecret = getString(R.string.flickr_secret);
+			flickr = new Flickr(flickrApi,flickrSecret, new REST());
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+
 		String token = sp.getString("px_token", null);
 		String tokensecret = sp.getString("px_tokensecret", null);
-		
-		if(token!=null && tokensecret!=null){
+
+		if (token != null && tokensecret != null) {
 			pxUser = new AccessToken(token, tokensecret);
 			Log.i("pxtoken", token);
 			Log.i("pxtokensecret", tokensecret);
 		}
 
 		flickr_token = sp.getString("flickr_token", null);
-		if(flickr_token!=null){
-			FlickrAuthRetrieveTask retrieveTask = new FlickrAuthRetrieveTask(flickr_token,
-					this, this, this);
+		if (flickr_token != null) {
+			FlickrAuthRetrieveTask retrieveTask = new FlickrAuthRetrieveTask(
+					flickr_token, this, this, this);
 			retrieveTask.execute("");
 		}
 		mViewPager.setCurrentItem(0);
@@ -386,7 +394,7 @@ public class MainActivity extends FragmentActivity implements
 	public void onPxLoggedIn(AccessToken user) {
 		System.out.println("500 px User logged in!");
 		this.pxUser = user;
-		
+
 		SharedPreferences sp = this.getSharedPreferences("seenit_prefs", 0);
 		Editor editor = sp.edit();
 		editor.putString("px_token", user.getToken());
@@ -404,12 +412,15 @@ public class MainActivity extends FragmentActivity implements
 	public void setSettingsFragment(SettingsFragment settingsFragment) {
 		this.settingsFragment = settingsFragment;
 	}
-	public AccessToken getPxToken(){
+
+	public AccessToken getPxToken() {
 		return pxUser;
 	}
-	public String getFlickrToken(){
+
+	public String getFlickrToken() {
 		return flickr_token;
 	}
+
 	public Double getRadius() {
 		return radius;
 	}
@@ -455,7 +466,5 @@ public class MainActivity extends FragmentActivity implements
 	public void setUseDateRange(boolean useDateRange) {
 		this.useDateRange = useDateRange;
 	}
-	
-	
 
 }
