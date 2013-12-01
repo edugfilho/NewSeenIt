@@ -20,8 +20,8 @@ import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.aetrion.flickr.Flickr;
 import com.example.mobileseenit.apis.FlickrLoginDialog;
 import com.example.mobileseenit.apis.FlickrUser;
 import com.example.mobileseenit.apis.PxLoginDialog;
@@ -37,19 +37,23 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 	public Spinner searchDiameter;
 
 	// Date picker components
-	Dialog picker;
-	Button selectAfter;
-	Button selectBefore;
-	Button set;
-	TextView beforeLabel;
-	TextView afterLabel;
+	private Dialog picker;
+	private Button selectAfter;
+	private Button selectBefore;
+	private Button set;
+	private TextView beforeLabel;
+	private TextView afterLabel;
+	private DatePicker datePicker;
+	private TextView dateImgAfter;
+	private TextView dateImgBefore;
 
-	DatePicker datePicker;
+	private MainActivity mainActivity;
 
-	TextView dateImgAfter;
-	TextView dateImgBefore;
-
-	MainActivity mainActivity;
+	//Login/logout buttons
+	private ImageButton loginFlickr;
+	private ImageButton logoutFlickr;
+	private ImageButton loginPx;
+	private ImageButton logoutPx;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,8 +73,8 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 		datePicker = (DatePicker) v.findViewById(R.id.datePicker);
 		dateImgAfter = (TextView) v.findViewById(R.id.textDateImgAfter);
 		dateImgBefore = (TextView) v.findViewById(R.id.textDateImgBefore);
-		afterLabel = (TextView)v.findViewById(R.id.settings_after_label);
-		beforeLabel = (TextView)v.findViewById(R.id.settings_before_label);
+		afterLabel = (TextView) v.findViewById(R.id.settings_after_label);
+		beforeLabel = (TextView) v.findViewById(R.id.settings_before_label);
 		initializeDateValues();
 
 		// Set dateAfter listener
@@ -112,7 +116,6 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 
 			@Override
 			public void onClick(View view) {
-				// TODO Auto-generated method stub
 				picker = new Dialog(mainActivity);
 				picker.setContentView(R.layout.fragment_date_picker);
 				picker.setTitle("Select date after:");
@@ -124,7 +127,6 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 
 					@Override
 					public void onClick(View view) {
-						// TODO Auto-generated method stub
 						mainActivity.getImgsBefore().set(datePicker.getYear(),
 								datePicker.getMonth(),
 								datePicker.getDayOfMonth());
@@ -136,7 +138,6 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 					}
 				});
 				picker.show();
-
 			}
 		});
 
@@ -153,6 +154,28 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 
 		// Check if user has selected to use date range
 		toggleChecked(mainActivity.useDateRange);
+
+		// Set logout button actions
+		logoutFlickr = (ImageButton) v
+				.findViewById(R.id.logout_flickr_account_button);
+		loginFlickr = (ImageButton) v
+				.findViewById(R.id.add_flickr_account_button);
+		loginPx = (ImageButton)v.findViewById(R.id.add_500px_account_button);
+		logoutPx = (ImageButton)v.findViewById(R.id.logout_px_account_button);
+
+		logoutFlickr.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				logoutFlickr();
+			}
+		});
+		
+		logoutPx.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				logoutPx();
+			}
+		});
 
 		// Set Add 500px Account button click handler
 		ImageButton pxButton = (ImageButton) v
@@ -184,6 +207,7 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 		// MainActivity
 		searchDiameter
 				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+					@Override
 					public void onItemSelected(AdapterView<?> parent,
 							View view, int pos, long id) {
 
@@ -194,6 +218,7 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 						mainActivity.setRadius(radius);
 					}
 
+					@Override
 					public void onNothingSelected(AdapterView<?> parent) {
 						StringTokenizer st = new StringTokenizer(parent
 								.getItemAtPosition(0).toString());
@@ -201,8 +226,15 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 						mainActivity.setRadius(radius);
 					}
 				});
+
 		return v;
 	}
+
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		updateUserInfo();
+	}
+	
 
 	private void initializeDateValues() {
 		Calendar cal = mainActivity.getImgsAfter();
@@ -245,27 +277,46 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 		}
 	}
 
+	/**
+	 * Called from an login auth tasks. Updates the username of the user that
+	 * just logged in. Also displays logout button once they are logged in.
+	 * 
+	 * Toggles login/logout buttons
+	 */
 	public void updateUserInfo() {
-		System.out.println("UPDATEUSERINGO");
-
 		// Check for Users
-		FlickrUser flickrUser = ((MainActivity) getActivity()).getFlickrUser();
+		Flickr flickr = mainActivity.getFlickr();
 		AccessToken pxUser = ((MainActivity) getActivity()).getPxUser();
 
-		if (flickrUser != null) {
+		TextView flickrUserNameText = (TextView) getView().findViewById(
+				R.id.flickr_username);
+		TextView pxUserNameText = (TextView) getView().findViewById(
+				R.id.px_username);
+		
+		if (flickr.getAuth() != null) {
 			// Set username text
-			TextView usernameTextView = (TextView) getView().findViewById(
-					R.id.flickr_username);
-			usernameTextView.setText(flickrUser.getUsername());
+			flickrUserNameText.setText(flickr.getAuth().getUser().getUsername());
 
-			// Remove add button, put in Logout button
-			// TODO
+			loginFlickr.setVisibility(View.GONE);
+			logoutFlickr.setVisibility(View.VISIBLE);
+
+		} else {
+			flickrUserNameText.setText("Not Logged In");
+			loginFlickr.setVisibility(View.VISIBLE);
+			logoutFlickr.setVisibility(View.GONE);
 		}
 
 		if (pxUser != null) {
-			TextView usernameTextView = (TextView) getView().findViewById(
-					R.id.px_username);
-			usernameTextView.setText(pxUser.getToken());
+			// Set username text
+			pxUserNameText.setText(pxUser.getToken());
+
+			loginPx.setVisibility(View.GONE);
+			logoutPx.setVisibility(View.VISIBLE);
+
+		} else {
+			pxUserNameText.setText("Not Logged In");
+			loginPx.setVisibility(View.VISIBLE);
+			logoutPx.setVisibility(View.GONE);
 		}
 
 	}
@@ -286,14 +337,21 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 		updateUserInfo();
 	}
 
+	/**
+	 * Toggles option to use Date Range to search for images. Will update
+	 * setting in MainActivity and show/hide related form elements in this
+	 * settings view.
+	 * 
+	 * @param checked
+	 */
 	private void toggleChecked(boolean checked) {
-		//Convert to int for visible
+		// Convert to int for visible
 		int visible;
-		if(checked)
+		if (checked)
 			visible = View.VISIBLE;
 		else
 			visible = View.INVISIBLE;
-		
+
 		// If checked, enable date fields
 		selectAfter.setVisibility(visible);
 		selectBefore.setVisibility(visible);
@@ -301,9 +359,28 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 		dateImgBefore.setVisibility(visible);
 		afterLabel.setVisibility(visible);
 		beforeLabel.setVisibility(visible);
-		
-		//save in MainActivity for later
+
+		// save in MainActivity for later
 		mainActivity.setUseDateRange(checked);
+	}
+
+	/**
+	 * Nulls the flickr auth in MainActivity, effectively
+	 * logging out.
+	 */
+	private void logoutFlickr() {
+		mainActivity.getFlickr().setAuth(null);
+		updateUserInfo();
+	}
+	
+	/**
+	 * Nulls the accessToken for 500px, logging
+	 * the user out
+	 */
+	private void logoutPx()
+	{
+		mainActivity.setPxUser(null);
+		updateUserInfo();
 	}
 
 	@Override

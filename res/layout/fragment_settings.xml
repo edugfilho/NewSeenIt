@@ -134,7 +134,18 @@
                     android:layout_alignParentRight="true"
                     android:background="@android:drawable/ic_menu_edit"
                     android:contentDescription="Edit Flickr Login Information"
-                    android:src="@android:drawable/ic_menu_edit" />
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:visibility="gone" />
+
+                <ImageButton
+                    android:id="@+id/logout_flickr_account_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@android:drawable/ic_menu_delete"
+                    android:contentDescription="Logout of Flickr"
+                    android:src="@android:drawable/ic_menu_delete"
+                    android:visibility="gone" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -165,7 +176,18 @@
                     android:layout_alignParentRight="true"
                     android:background="@android:drawable/ic_menu_edit"
                     android:contentDescription="Edit Instagram Login Information"
-                    android:src="@android:drawable/ic_menu_edit" />
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:visibility="gone" />
+
+                <ImageButton
+                    android:id="@+id/logout_px_account_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:background="@android:drawable/ic_menu_delete"
+                    android:contentDescription="Logout of 500px"
+                    android:src="@android:drawable/ic_menu_delete"
+                    android:visibility="gone" />
             </RelativeLayout>
         </LinearLayout>
     </LinearLayout>

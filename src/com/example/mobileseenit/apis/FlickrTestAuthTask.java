@@ -37,21 +37,21 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 	String token = "";
 
 	FlickrLoginDialog fragment;
-	AuthInterface a;
+	AuthInterface authInterface;
 	MainActivity mainActivity;
 	Auth auth;
 	Context context;
 	boolean goodAuth;
 
-	public FlickrTestAuthTask(FlickrLoginDialog gg, AuthInterface a,
+	public FlickrTestAuthTask(FlickrLoginDialog flickrLoginDialog, AuthInterface a,
 			Context context) {
 
-		fragment = gg;
-		mainActivity = (MainActivity) gg.getActivity();
+		fragment = flickrLoginDialog;
+		mainActivity = (MainActivity) flickrLoginDialog.getActivity();
 		this.context = context;
 
 		f = mainActivity.getFlickr();
-		this.a = f.getAuthInterface();
+		this.authInterface = f.getAuthInterface();
 		goodAuth = false;
 	}
 
@@ -68,20 +68,12 @@ public class FlickrTestAuthTask extends AsyncTask<String, Void, String> {
 	public String search(String... frobString) throws IOException,
 			SAXException, ParserConfigurationException {
 
-		BufferedReader infile = new BufferedReader(new InputStreamReader(
-				System.in));
-		String line = infile.readLine();
 		try {
 			frob = frobString[0];
 			auth = f.getAuthInterface().getToken(frob);
 			f.setAuth(auth);
 			System.out.println("Authentication success");
 			// This token can be used until the user revokes it.
-			System.out.println("Token: " + auth.getToken());
-			System.out.println("nsid: " + auth.getUser().getId());
-			System.out.println("Realname: " + auth.getUser().getRealName());
-			System.out.println("Username: " + auth.getUser().getUsername());
-			System.out.println("Permission: " + auth.getPermission().getType());
 			goodAuth = true;
 
 		} catch (FlickrException e) {
