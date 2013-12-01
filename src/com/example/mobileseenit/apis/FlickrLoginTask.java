@@ -29,15 +29,15 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 	String token = "";
 	WebView myWebView;
 
-	DialogFragment fragment;
+	DialogFragment dialogFragment;
 	AuthInterface a;
 
-	public FlickrLoginTask(WebView v, DialogFragment gg) {
-		fragment = gg;
+	public FlickrLoginTask(WebView v, DialogFragment dialogFragment) {
+		this.dialogFragment = dialogFragment;
 		myWebView = v;
 	
 		//Get flickr object from MainAcivity
-		flickr = ((MainActivity) gg.getActivity()).getFlickr();
+		flickr = ((MainActivity) this.dialogFragment.getActivity()).getFlickr();
 	}
 
 	@Override
@@ -87,15 +87,12 @@ public class FlickrLoginTask extends AsyncTask<String, Void, String> {
 	@Override
 	protected void onPostExecute(String result) {
 		if (result.contains("http")) {
-			
 			myWebView.setWebViewClient(new WebViewClient());
 			myWebView.clearCache(true);
 			myWebView.getSettings().setJavaScriptEnabled(true);
 			myWebView.loadUrl(result);
-			
-			((FlickrLoginDialog) fragment).updateFlickr(flickr, frob);
+			((FlickrLoginDialog) dialogFragment).updateFlickr(flickr, frob);
 		}
 
 	}
-
 }

@@ -32,21 +32,27 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	// Number of images to load at once.
 	private static final int LOAD_COUNT = 4;
 
-	// Reference to the calling fragment (flickr)
-	private MainActivity g;
+	// Reference the activity
+	private MainActivity mainActivity;
 
 	// Our FlickrJ object
-	private Flickr f;
+	private Flickr flickr;
 
-	// Array of bitmaps to return to the fragment
+	// Array of photowrappers to transport photos
 	private LinkedList<PhotoWrapper> photos;
 
-	public FlickrSearchTask(Activity g) {
+	/**
+	 * Constructor just to get the MainActivity and 
+	 * it's Flickr Object
+	 * 
+	 * @param mainActivity
+	 */
+	public FlickrSearchTask(Activity mainActivity) {
 		// get ref to Main Activity
-		this.g = (MainActivity) g;
+		this.mainActivity = (MainActivity) mainActivity;
 
 		// Take the shared flickr object
-		f = this.g.getFlickr();
+		flickr = this.mainActivity.getFlickr();
 	}
 
 	// Async task - call the method to run.
@@ -79,21 +85,20 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		}
 
 		searchParams.setHasGeo(true);
-		searchParams.setLatitude(g.getLat().toString());
-		searchParams.setLongitude(g.getLng().toString());
-		searchParams.setRadius(g.getRadius().intValue());
+		searchParams.setLatitude(mainActivity.getLat().toString());
+		searchParams.setLongitude(mainActivity.getLng().toString());
+		searchParams.setRadius(mainActivity.getRadius().intValue());
 		searchParams.setRadiusUnits("km");
-		if (g.useDateRange) {
-			searchParams.setMinTakenDate(g.getImgsAfter().getTime());
-			searchParams.setMaxTakenDate(g.getImgsBefore().getTime());
+		if (mainActivity.useDateRange) {
+			searchParams.setMinTakenDate(mainActivity.getImgsAfter().getTime());
+			searchParams.setMaxTakenDate(mainActivity.getImgsBefore().getTime());
 		}
 
 		// Initialize PhotosInterface object
-		PhotosInterface photosInterface = f.getPhotosInterface();
+		PhotosInterface photosInterface = flickr.getPhotosInterface();
 		// Execute search with entered tags
 		try {
-			// Search params search(SearchParameters params, int perPage, int
-			// page)
+	
 			PhotoList photoList = photosInterface.search(searchParams,
 					LOAD_COUNT, 1);
 			// get search result and fetch the photo object and get small square
@@ -107,7 +112,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 					// Checks if the photo isn't already in the photoList before
 					// adding
-					if (!g.getUrls().contains(photo.getUrl())) {
+					if (!mainActivity.getUrls().contains(photo.getUrl())) {
 						// construct url
 						// http://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
 						StringBuilder urlBuilder = new StringBuilder();
@@ -129,7 +134,6 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 						photos.add(newPhoto);
 
 					}
-
 				}
 			}
 		} catch (Exception e) {
@@ -138,12 +142,18 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		return "done";
 	}
 
+	/**
+	 * Fetch the bitmap corresponding the image at the supplied
+	 * url.
+	 * 
+	 * @param url
+	 * @return Bitmap
+	 */
 	protected Bitmap process(String url) {
 		String urldisplay = url;
 		Bitmap mIcon11 = null;
 		try {
 			InputStream in = new java.net.URL(urldisplay).openStream();
-			// in.reset();
 			mIcon11 = BitmapFactory.decodeStream(in);
 		} catch (Exception e) {
 			Log.e("Error", e.getMessage());
@@ -157,13 +167,13 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	protected void onPostExecute(String result) {
 		// TODO keep it?\/
 		if (photos.isEmpty()) {
-			Toast.makeText(g, "Flickr didn't find anything", Toast.LENGTH_SHORT)
+			Toast.makeText(mainActivity, "Flickr didn't find anything", Toast.LENGTH_SHORT)
 					.show();
 		} else {
-			Toast.makeText(g, "Flickr photos loaded", Toast.LENGTH_SHORT)
+			Toast.makeText(mainActivity, "Flickr photos loaded", Toast.LENGTH_SHORT)
 					.show();
 		}
-		g.addPhotos(photos);
+		mainActivity.addPhotos(photos);
 
 	}
 

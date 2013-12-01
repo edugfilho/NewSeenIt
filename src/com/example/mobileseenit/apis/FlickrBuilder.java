@@ -25,7 +25,6 @@ public class FlickrBuilder {
 		try {
 			flickrObject = new Flickr(API_KEY, SECRET, new REST());
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return flickrObject;

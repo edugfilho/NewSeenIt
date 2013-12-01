@@ -9,21 +9,28 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 
 import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.auth.Auth;
 import com.aetrion.flickr.auth.AuthInterface;
 import com.example.mobileseenit.R;
 
+/**
+ * Class to encapsulate a user logging into Flickr. Displays a dialog box with a
+ * webview that gets populated with the login window from Flickr. The User is
+ * meant to login and then use the 'back' button to close the dialog.
+ * 
+ * @author dylanrunkel
+ * 
+ */
 public class FlickrLoginDialog extends DialogFragment {
 
-	AuthInterface authInterface;
-	WebView myWeb;
-	FlickrLoginTask loginTask;
-	String frob;
-	Flickr f;
+	private AuthInterface authInterface;
+	private WebView myWeb;
+	private FlickrLoginTask loginTask;
+	private String frob;
+	private Flickr flickr;
 
 	public static FlickrLoginDialog newInstance() {
-		FlickrLoginDialog f = new FlickrLoginDialog();
-		return f;
+		FlickrLoginDialog loginDialog = new FlickrLoginDialog();
+		return loginDialog;
 	}
 
 	@Override
@@ -46,21 +53,19 @@ public class FlickrLoginDialog extends DialogFragment {
 	// Called from FlickrAuth after user logs in.
 	// User is created. Send this to MainAcitity
 	public void acceptFlickrUser(FlickrUser user) {
-		FlickrUser uu = user;
-		System.out.println();
-
 		// Tell MainActivity that user is logged in on Flickr
-		//Pass it the user and the auth
+		// Pass it the user and the auth
 		mCallback.onFlickLoggedIn(user);
 	}
 
+	public void updateFlickr(Flickr flickr, String frob) {
+		this.flickr = flickr;
 
-	public void updateFlickr(Flickr f, String frob) {
-		this.f = f;
-
+		// Get the frob
 		this.frob = frob;
+
 		// Update flickr object in MainActivity
-		updateFlickrCallback.onUpdateFlickr(f);
+		updateFlickrCallback.onUpdateFlickr(this.flickr);
 	}
 
 	// When user closes login dialog for Flickr
@@ -68,14 +73,13 @@ public class FlickrLoginDialog extends DialogFragment {
 	public void onDestroy() {
 		super.onDestroy();
 		try {
-
 			// Check the Auth, build a FlickrUser
-			FlickrTestAuthTask lol = new FlickrTestAuthTask(this, authInterface, this.getActivity());
+			FlickrTestAuthTask lol = new FlickrTestAuthTask(this,
+					authInterface, this.getActivity());
 			lol.execute(frob);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -87,6 +91,7 @@ public class FlickrLoginDialog extends DialogFragment {
 	// Container Activity must implement this interface
 	public interface OnFlickrLoggedInListener {
 		public void onFlickLoggedIn(FlickrUser user);
+
 		public void onFlickrAuthRetrieved(FlickrUser user);
 	}
 
