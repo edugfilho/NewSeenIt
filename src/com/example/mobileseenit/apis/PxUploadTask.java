@@ -18,66 +18,57 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.aetrion.flickr.Flickr;
 import com.example.mobileseenit.MainActivity;
 import com.example.mobileseenit.R;
 import com.fivehundredpx.api.PxApi;
+
 /**
-
- * @author dylanrunkel
- * 
+ * Async Task that is responsible for uploading a photo and related metadeta to
+ * 500px
  */
-public class PxUploadTask extends AsyncTask<String, Void, JSONObject>{
+public class PxUploadTask extends AsyncTask<String, Void, JSONObject> {
 
+	private Context context;
+	private String path;
+	private PxApi pxApi;
+	private String id;
+	private String key;
 
-	Context context;
-	String path;
-	Flickr f;
-	PxApi pxApi;
-	String id;
-	String key;
-
-	
 	@Override
 	protected void onPostExecute(JSONObject result) {
-		// TODO Auto-generated method stub
 		super.onPostExecute(result);
-		if(result!=null){
-			
+		if (result != null) {
+
 			try {
 				String error = result.getString("error");
 				String status = result.getString("status");
 				Log.i("status", status);
-				if(error.equals("None.")){
+				if (error.equals("None.")) {
 					Toast.makeText(context, "500px upload successful!",
-						     Toast.LENGTH_LONG).show();
-				}
-				else 
-					Toast.makeText(context, "500px upload failed: User not logged in or login failed!",
-						     Toast.LENGTH_LONG).show();
+							Toast.LENGTH_LONG).show();
+				} else
+					Toast.makeText(
+							context,
+							"500px upload failed: User not logged in or login failed!",
+							Toast.LENGTH_LONG).show();
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
 	}
-
-
 
 	public PxUploadTask(String path, Context context, String id, String key) {
 		this.path = path;
 		this.context = context;
 		this.id = id;
 		this.key = key;
-		f = ((MainActivity)this.context).getFlickr();
-		pxApi = new PxApi(((MainActivity)this.context).getPxToken(),
+		pxApi = new PxApi(((MainActivity) this.context).getPxToken(),
 				context.getString(R.string.px_consumer_key),
 				context.getString(R.string.px_consumer_secret));
 	}
@@ -86,24 +77,26 @@ public class PxUploadTask extends AsyncTask<String, Void, JSONObject>{
 	protected JSONObject doInBackground(String... params) {
 
 		try {
-			
+
 			HttpClient client = new DefaultHttpClient();
-		    HttpPost post = new HttpPost("https://api.500px.com/v1/upload");
-		    MultipartEntityBuilder builder = MultipartEntityBuilder.create();        
-		    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-		    Charset chars = Charset.forName("UTF-8");
-		    builder.setCharset(chars);
+			HttpPost post = new HttpPost("https://api.500px.com/v1/upload");
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+			Charset chars = Charset.forName("UTF-8");
+			builder.setCharset(chars);
 
-		    final File file = new File(path);
-		    FileBody fb = new FileBody(file);
+			final File file = new File(path);
+			FileBody fb = new FileBody(file);
 
-		    builder.addPart("file", fb);  
-		    builder.addTextBody("photo_id", id);
-		    builder.addTextBody("upload_key", key);
-		    builder.addTextBody("consumer_key", context.getString(R.string.px_consumer_key));
-		    builder.addTextBody("access_key", ((MainActivity)this.context).getPxToken().getToken());
-		    final HttpEntity entity = builder.build();
-		    post.setEntity(entity);
+			builder.addPart("file", fb);
+			builder.addTextBody("photo_id", id);
+			builder.addTextBody("upload_key", key);
+			builder.addTextBody("consumer_key",
+					context.getString(R.string.px_consumer_key));
+			builder.addTextBody("access_key", ((MainActivity) this.context)
+					.getPxToken().getToken());
+			final HttpEntity entity = builder.build();
+			post.setEntity(entity);
 			HttpResponse response = client.execute(post);
 			final int statusCode = response.getStatusLine().getStatusCode();
 
@@ -133,7 +126,7 @@ public class PxUploadTask extends AsyncTask<String, Void, JSONObject>{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 

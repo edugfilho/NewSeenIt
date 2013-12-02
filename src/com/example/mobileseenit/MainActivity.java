@@ -99,9 +99,9 @@ public class MainActivity extends FragmentActivity implements
 		// Default date range to false
 		useDateRange = false;
 
-		// Set settings default values
+		// Set settings default values (from 1yr ago to now)
 		imgsAfter = Calendar.getInstance();
-		// imgsAfter.set(Calendar.YEAR, 1990);
+		imgsAfter.set(Calendar.YEAR, imgsAfter.get(Calendar.YEAR)-1);
 		imgsBefore = Calendar.getInstance();
 
 		// Add your fragments here

@@ -1,34 +1,19 @@
 package com.example.mobileseenit.apis;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.NameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.SAXException;
-
 import android.content.Context;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
-import android.util.Log;
-import android.widget.Toast;
-
 import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.FlickrException;
-import com.aetrion.flickr.RequestContext;
-import com.aetrion.flickr.uploader.UploadMetaData;
 import com.example.mobileseenit.MainActivity;
 import com.example.mobileseenit.R;
 import com.fivehundredpx.api.PxApi;
 /**
-
- * @author dylanrunkel & YixuanLi
- * 
+ * Async Task that requests an upload key from
+ * 500px in order to upload a picture.
  */
 public class PxUploadKeyTask extends AsyncTask<String, Void, JSONObject>{
 
@@ -42,7 +27,6 @@ public class PxUploadKeyTask extends AsyncTask<String, Void, JSONObject>{
 	
 	@Override
 	protected void onPostExecute(JSONObject result) {
-		// TODO Auto-generated method stub
 		super.onPostExecute(result);
 		if(result!=null&&!result.isNull("upload_key")){
 			try {
@@ -53,7 +37,6 @@ public class PxUploadKeyTask extends AsyncTask<String, Void, JSONObject>{
 				PxUploadTask p = new PxUploadTask(path,context,id,key);
 				p.execute("");
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

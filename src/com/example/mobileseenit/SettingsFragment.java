@@ -1,6 +1,7 @@
 package com.example.mobileseenit;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 import android.app.Dialog;
@@ -136,13 +137,11 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 				datePicker.setCalendarViewShown(false);
 
 				//Setting the minimum date for datePicker:
-				Calendar minDate = Calendar.getInstance();
-				minDate.set(Calendar.YEAR, minDate.get(Calendar.YEAR)-1);	
-				datePicker.setMinDate(minDate.getTimeInMillis());
+				String minDate = (String) dateImgAfter.getText();
+				datePicker.setMinDate(Date.parse(minDate));
 				
 				//Setting the maximum date
 				datePicker.setMaxDate(Calendar.getInstance().getTimeInMillis());
-				
 				set = (Button) picker.findViewById(R.id.btnSet);
 
 				set.setOnClickListener(new View.OnClickListener() {

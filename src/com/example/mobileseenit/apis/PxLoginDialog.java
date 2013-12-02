@@ -11,15 +11,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.aetrion.flickr.Flickr;
-import com.example.mobileseenit.MainActivity;
 import com.example.mobileseenit.R;
-import com.example.mobileseenit.apis.FlickrLoginDialog.OnFlickrLoggedInListener;
-import com.example.mobileseenit.apis.FlickrLoginDialog.OnUpdateFlickrListener;
 import com.fivehundredpx.api.FiveHundredException;
 import com.fivehundredpx.api.auth.AccessToken;
 import com.fivehundredpx.api.tasks.XAuth500pxTask;
 
+/**
+ * Encapsulates a user login to 500px.
+ * Shows a dialog that will ask for username and password. Will
+ * close upon successful login.
+ *
+ */
 public class PxLoginDialog extends DialogFragment implements
 		XAuth500pxTask.Delegate, OnClickListener {
 
@@ -43,9 +45,11 @@ public class PxLoginDialog extends DialogFragment implements
 		return v;
 	}
 
+	/**
+	 * Successful login
+	 */
 	@Override
 	public void onSuccess(AccessToken result) {
-		// TODO Auto-generated method stub
 		Log.i(TAG, "success " + result);
 		
 		//Set the user back in main activity
@@ -59,7 +63,6 @@ public class PxLoginDialog extends DialogFragment implements
 	public void onFail(FiveHundredException e) {
 		// TODO Auto-generated method stub
 		//TODO login fail
-
 	}
 
 	@Override
@@ -104,5 +107,4 @@ public class PxLoginDialog extends DialogFragment implements
 					+ " must implement OnFlickrLoggedInListener");
 		}
 	}
-
 }
