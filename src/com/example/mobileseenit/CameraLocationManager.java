@@ -33,7 +33,7 @@ public class CameraLocationManager {
 	}
 	void startRecordLocations() {
 		if(mLocationManager==null){
-			mLocationManager = (LocationManager) context.getSystemService(context.LOCATION_SERVICE);
+			mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		}
 		try{
 			mLocationManager.requestLocationUpdates

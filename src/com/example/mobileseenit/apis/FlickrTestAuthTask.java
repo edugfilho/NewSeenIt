@@ -1,8 +1,6 @@
 package com.example.mobileseenit.apis;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 

@@ -54,6 +54,7 @@ public class SeenItLocation implements LocationListener {
 	}
 
 	LocationListener locationListenerGps = new LocationListener() {
+		@Override
 		public void onLocationChanged(Location location) {
 			//timer1.cancel();
 			locationResult.gotLocation(location);
@@ -61,17 +62,21 @@ public class SeenItLocation implements LocationListener {
 			// locationManager.removeUpdates(locationListenerNetwork);
 		}
 
+		@Override
 		public void onProviderDisabled(String provider) {
 		}
 
+		@Override
 		public void onProviderEnabled(String provider) {
 		}
 
+		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
 	};
 
 	LocationListener locationListenerNetwork = new LocationListener() {
+		@Override
 		public void onLocationChanged(Location location) {
 			timer1.cancel();
 			locationResult.gotLocation(location);
@@ -79,12 +84,15 @@ public class SeenItLocation implements LocationListener {
 			// locationManager.removeUpdates(locationListenerGps);
 		}
 
+		@Override
 		public void onProviderDisabled(String provider) {
 		}
 
+		@Override
 		public void onProviderEnabled(String provider) {
 		}
 
+		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
 	};

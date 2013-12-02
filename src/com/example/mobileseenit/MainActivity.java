@@ -11,7 +11,6 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -20,8 +19,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
-import android.widget.Toast;
-
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.REST;
 import com.example.mobileseenit.apis.FlickrAuthRetrieveTask;
