@@ -50,8 +50,8 @@ public class MainFragment extends Fragment implements OnTouchListener,
 							"Location acquired. Displaying pictures",
 							Toast.LENGTH_SHORT).show();
 
-					 flickrSearch = new FlickrSearchTask(getActivity());
-					 flickrSearch.execute();
+					flickrSearch = new FlickrSearchTask(getActivity());
+					flickrSearch.execute();
 
 					// Search 500px Images
 					pxSearchTask = new PxSearchTask(getActivity());
@@ -112,6 +112,15 @@ public class MainFragment extends Fragment implements OnTouchListener,
 				.getLoc()
 				.getLocationManager()
 				.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
+						mainActivity.getRadius().floatValue() * 1000,
+						mainActivity.getLoc().locationListenerGps);
+		mainActivity.getLoc().getLocation(getActivity(), locationResult);
+
+		mainActivity
+				.getLoc()
+				.getLocationManager()
+				.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
 						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
 						mainActivity.getRadius().floatValue() * 1000,
 						mainActivity.getLoc().locationListenerGps);
