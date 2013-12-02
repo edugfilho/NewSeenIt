@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -20,7 +18,6 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -28,9 +25,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
-import com.aetrion.flickr.FlickrException;
-import com.aetrion.flickr.RequestContext;
-import com.aetrion.flickr.uploader.UploadMetaData;
 import com.example.mobileseenit.MainActivity;
 import com.example.mobileseenit.R;
 import com.fivehundredpx.api.PxApi;

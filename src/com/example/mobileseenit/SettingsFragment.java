@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -85,10 +86,21 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 				// TODO Auto-generated method stub
 				picker = new Dialog(mainActivity);
 				picker.setContentView(R.layout.fragment_date_picker);
-				picker.setTitle("Select date after:");
+				picker.setTitle("Show images after this date:");
 
 				datePicker = (DatePicker) picker.findViewById(R.id.datePicker);
-
+				
+				
+				//Setting the minimum date for datePicker:
+				Calendar minDate = Calendar.getInstance();
+				minDate.set(Calendar.YEAR, minDate.get(Calendar.YEAR)-1);	
+				datePicker.setMinDate(minDate.getTimeInMillis());
+				
+				//Setting the maximum date
+				datePicker.setMaxDate(Calendar.getInstance().getTimeInMillis());
+				
+				datePicker.setCalendarViewShown(false);
+				
 				set = (Button) picker.findViewById(R.id.btnSet);
 
 				set.setOnClickListener(new View.OnClickListener() {
@@ -118,9 +130,19 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 			public void onClick(View view) {
 				picker = new Dialog(mainActivity);
 				picker.setContentView(R.layout.fragment_date_picker);
-				picker.setTitle("Select date after:");
+				picker.setTitle("Show images before this date:");
 
 				datePicker = (DatePicker) picker.findViewById(R.id.datePicker);
+				datePicker.setCalendarViewShown(false);
+
+				//Setting the minimum date for datePicker:
+				Calendar minDate = Calendar.getInstance();
+				minDate.set(Calendar.YEAR, minDate.get(Calendar.YEAR)-1);	
+				datePicker.setMinDate(minDate.getTimeInMillis());
+				
+				//Setting the maximum date
+				datePicker.setMaxDate(Calendar.getInstance().getTimeInMillis());
+				
 				set = (Button) picker.findViewById(R.id.btnSet);
 
 				set.setOnClickListener(new View.OnClickListener() {
