@@ -296,8 +296,6 @@ protected void stopPreview(){
 	public void capture() {
 		// TODO Auto-generated method stub
     	Location loc = mLocationManager.getLocation();
-    	Log.i("long", "long: "+ loc.getLongitude());
-    	Log.i("lat", "lat: "+ loc.getLatitude());
     	para.removeGpsData();
     	para.setGpsTimestamp(System.currentTimeMillis()/1000);
     	if(loc!=null){
@@ -422,7 +420,10 @@ protected void stopPreview(){
             	ByteArrayOutputStream stream = new ByteArrayOutputStream();
             	modifiedbMap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             	byte[] myData = stream.toByteArray();
-            	listener.onSwitchToUpload(myData, new double[]{mLoc.getLatitude(),mLoc.getLongitude()}, file.getPath());
+            	if(mLoc == null)
+            		listener.onSwitchToUpload(myData, new double[]{0,0}, file.getPath());
+            	else
+            		listener.onSwitchToUpload(myData, new double[]{mLoc.getLatitude(),mLoc.getLongitude()}, file.getPath());
             	
             } catch(IOException e){
             	e.printStackTrace();
