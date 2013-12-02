@@ -22,7 +22,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.example.mobileseenit.MainActivity;
 import com.example.mobileseenit.R;
 import com.fivehundredpx.api.PxApi;

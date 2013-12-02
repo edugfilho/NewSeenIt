@@ -33,3 +33,9 @@ proguard/
 
 # Windows generated files
 Thumbs.db
+/AndroidManifest.xml
+/ic_launcher-web.png
+/lint.xml
+/proguard-project.txt
+/project.properties
+/README.md

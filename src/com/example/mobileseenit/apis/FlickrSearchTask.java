@@ -3,6 +3,7 @@ package com.example.mobileseenit.apis;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,7 +31,7 @@ import com.example.mobileseenit.helpers.PhotoWrapper;
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 	// Number of images to load at once.
-	private static final int LOAD_COUNT = 4;
+	private static final int LOAD_COUNT = 7;
 
 	// Reference the activity
 	private MainActivity mainActivity;
@@ -42,8 +43,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	private LinkedList<PhotoWrapper> photos;
 
 	/**
-	 * Constructor just to get the MainActivity and 
-	 * it's Flickr Object
+	 * Constructor just to get the MainActivity and it's Flickr Object
 	 * 
 	 * @param mainActivity
 	 */
@@ -91,14 +91,15 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		searchParams.setRadiusUnits("km");
 		if (mainActivity.useDateRange) {
 			searchParams.setMinTakenDate(mainActivity.getImgsAfter().getTime());
-			searchParams.setMaxTakenDate(mainActivity.getImgsBefore().getTime());
+			searchParams
+					.setMaxTakenDate(mainActivity.getImgsBefore().getTime());
 		}
 
 		// Initialize PhotosInterface object
 		PhotosInterface photosInterface = flickr.getPhotosInterface();
 		// Execute search with entered tags
 		try {
-	
+
 			PhotoList photoList = photosInterface.search(searchParams,
 					LOAD_COUNT, 1);
 			// get search result and fetch the photo object and get small square
@@ -112,28 +113,27 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 					// Checks if the photo isn't already in the photoList before
 					// adding
-					if (!mainActivity.getUrls().contains(photo.getUrl())) {
-						// construct url
-						// http://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
-						StringBuilder urlBuilder = new StringBuilder();
-						urlBuilder.append("http://farm");
-						urlBuilder.append(photo.getFarm());
-						urlBuilder.append(".staticflickr.com/");
-						urlBuilder.append(photo.getServer());
-						urlBuilder.append("/");
-						urlBuilder.append(photo.getId());
-						urlBuilder.append("_");
-						urlBuilder.append(photo.getSecret());
-						urlBuilder.append(".jpg");
 
-						Bitmap b = process(urlBuilder.toString());
+					// construct url
+					// http://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
+					StringBuilder urlBuilder = new StringBuilder();
+					urlBuilder.append("http://farm");
+					urlBuilder.append(photo.getFarm());
+					urlBuilder.append(".staticflickr.com/");
+					urlBuilder.append(photo.getServer());
+					urlBuilder.append("/");
+					urlBuilder.append(photo.getId());
+					urlBuilder.append("_");
+					urlBuilder.append(photo.getSecret());
+					urlBuilder.append(".jpg");
+					
+					Bitmap b = process(urlBuilder.toString());
 
-						// Construct new photowrapper for each image.
-						PhotoWrapper newPhoto = new PhotoWrapper(b,
-								photoList.get(i), PhotoWrapper.FLICKR_OBJECT);
-						photos.add(newPhoto);
+					// Construct new photowrapper for each image.
+					PhotoWrapper newPhoto = new PhotoWrapper(b,
+							photoList.get(i), PhotoWrapper.FLICKR_OBJECT);
+					photos.add(newPhoto);
 
-					}
 				}
 			}
 		} catch (Exception e) {
@@ -143,8 +143,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	}
 
 	/**
-	 * Fetch the bitmap corresponding the image at the supplied
-	 * url.
+	 * Fetch the bitmap corresponding the image at the supplied url.
 	 * 
 	 * @param url
 	 * @return Bitmap
@@ -167,11 +166,11 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	protected void onPostExecute(String result) {
 		// TODO keep it?\/
 		if (photos.isEmpty()) {
-			Toast.makeText(mainActivity, "Flickr didn't find anything", Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(mainActivity, "Flickr didn't find anything",
+					Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(mainActivity, "Flickr photos loaded", Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(mainActivity, "Flickr photos loaded",
+					Toast.LENGTH_SHORT).show();
 		}
 		mainActivity.addPhotos(photos);
 

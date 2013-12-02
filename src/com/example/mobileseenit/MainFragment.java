@@ -1,7 +1,6 @@
 package com.example.mobileseenit;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import android.location.Location;
 import android.location.LocationManager;
@@ -51,12 +50,12 @@ public class MainFragment extends Fragment implements OnTouchListener,
 							"Location acquired. Displaying pictures",
 							Toast.LENGTH_SHORT).show();
 
-					flickrSearch = new FlickrSearchTask(getActivity());
-					flickrSearch.execute();
+					 flickrSearch = new FlickrSearchTask(getActivity());
+					 flickrSearch.execute();
 
 					// Search 500px Images
-					 pxSearchTask = new PxSearchTask(getActivity());
-					 pxSearchTask.execute("search");
+					pxSearchTask = new PxSearchTask(getActivity());
+					pxSearchTask.execute("search");
 
 				}
 			});
@@ -73,17 +72,15 @@ public class MainFragment extends Fragment implements OnTouchListener,
 
 		// Display images
 		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
+		LinearLayout r = (LinearLayout) getView().findViewById(
+				R.id.photo_stream);
 		for (PhotoWrapper p : photos) {
 
-			LinearLayout r = (LinearLayout) getView().findViewById(
-					R.id.photo_stream);
 			PhotoStreamImageView newImage = new PhotoStreamImageView(
 					getActivity(), p);
 			r.addView(newImage);
 		}
-
 	}
-
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,8 +90,6 @@ public class MainFragment extends Fragment implements OnTouchListener,
 				false);
 
 		mainActivity = (MainActivity) getActivity();
-
-		Toast.makeText(getActivity(), "CreateView", Toast.LENGTH_SHORT).show();
 		return rootView;
 	}
 
@@ -110,26 +105,16 @@ public class MainFragment extends Fragment implements OnTouchListener,
 	}
 
 	@Override
-	public void onPause() {
-		// Stops any location request
-		/*
-		 * mainActivity.getLoc().getLocationManager()
-		 * .removeUpdates(mainActivity.getLoc().locationListenerGps);
-		 */
-		super.onPause();
-	}
-
-	@Override
-	public void onStop() {
-		// Stops any location request
-		mainActivity.getLoc().getLocationManager()
-				.removeUpdates(mainActivity.getLoc().locationListenerGps);
-		super.onPause();
-	}
-
-	@Override
 	public void onResume() {
 
+		// Whenever GPS acquires location, the images are fetched and shown
+		mainActivity
+				.getLoc()
+				.getLocationManager()
+				.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
+						mainActivity.getRadius().floatValue() * 1000,
+						mainActivity.getLoc().locationListenerGps);
 		mainActivity.getLoc().getLocation(getActivity(), locationResult);
 
 		Toast.makeText(getActivity(), "Getting location...", Toast.LENGTH_SHORT)
@@ -137,5 +122,4 @@ public class MainFragment extends Fragment implements OnTouchListener,
 
 		super.onResume();
 	}
-
 }
