@@ -43,8 +43,6 @@ public class MainActivity extends FragmentActivity implements
 	// Currently loaded photos
 	ArrayList<PhotoWrapper> photoList;
 
-	ArrayList<String> urls;
-
 	// Fragments
 	MainFragment mainFragment;
 	SettingsFragment settingsFragment;
@@ -83,25 +81,15 @@ public class MainActivity extends FragmentActivity implements
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		// Initialize location object
-		loc = new SeenItLocation();
+		loc = new SeenItLocation(this);
 		radius = 1.0; // default value, change for constant
-
-		if (getLoc().gps_enabled) {
-			getLoc().getLocationManager().requestLocationUpdates(
-					LocationManager.GPS_PROVIDER,
-					getLoc().getUpdateIntervalTimeMilisec(),
-					getRadius().floatValue(), getLoc().locationListenerGps);
-			Toast.makeText(this, "Getting location...", Toast.LENGTH_SHORT)
-					.show();
-
-		}
 
 		// Default date range to false
 		useDateRange = false;
 
 		// Set settings default values (from 1yr ago to now)
 		imgsAfter = Calendar.getInstance();
-		imgsAfter.set(Calendar.YEAR, imgsAfter.get(Calendar.YEAR)-1);
+		imgsAfter.set(Calendar.YEAR, imgsAfter.get(Calendar.YEAR) - 1);
 		imgsBefore = Calendar.getInstance();
 
 		// Add your fragments here
@@ -140,13 +128,12 @@ public class MainActivity extends FragmentActivity implements
 		}
 
 		photoList = new ArrayList<PhotoWrapper>();
-		urls = new ArrayList<String>();
 
 		// Initialize Flickr Object
 		try {
 			String flickrApi = getString(R.string.flickr_api_key);
 			String flickrSecret = getString(R.string.flickr_secret);
-			flickr = new Flickr(flickrApi,flickrSecret, new REST());
+			flickr = new Flickr(flickrApi, flickrSecret, new REST());
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		}
@@ -173,14 +160,12 @@ public class MainActivity extends FragmentActivity implements
 	// Can be called from search methods. Adds the PhotoWrappers to
 	// the current list
 	public void addPhotos(LinkedList<PhotoWrapper> photos) {
-
-		// Store photo url
-		for (PhotoWrapper photoWrapper : photos) {
-			urls.add(photoWrapper.getDetailMap().get(PhotoWrapper.LINK_FIELD));
+		synchronized (photoList) {
+			photoList = new ArrayList<PhotoWrapper>();
+			photoList.addAll(photos);
+			if (!mainFragment.isDetached())
+				mainFragment.updateDisplayedPhotos();
 		}
-		photoList.addAll(photos);
-		if (!mainFragment.isDetached())
-			mainFragment.updateDisplayedPhotos();
 	}
 
 	@Override
@@ -209,11 +194,15 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	public ArrayList<PhotoWrapper> getPhotoList() {
-		return photoList;
+		synchronized (photoList) {
+			return photoList;
+		}
 	}
 
 	public void setPhotoList(ArrayList<PhotoWrapper> photoList) {
-		this.photoList = photoList;
+		synchronized (photoList) {
+			this.photoList = photoList;
+		}
 	}
 
 	/**
@@ -429,14 +418,6 @@ public class MainActivity extends FragmentActivity implements
 		this.radius = radius;
 	}
 
-	public ArrayList<String> getUrls() {
-		return urls;
-	}
-
-	public void setUrls(ArrayList<String> urls) {
-		this.urls = urls;
-	}
-
 	public Calendar getImgsAfter() {
 		return imgsAfter;
 	}
@@ -465,6 +446,14 @@ public class MainActivity extends FragmentActivity implements
 
 	public void setUseDateRange(boolean useDateRange) {
 		this.useDateRange = useDateRange;
+	}
+
+	@Override
+	public void onStop() {
+		// Stops any location request
+		getLoc().getLocationManager().removeUpdates(
+				getLoc().locationListenerGps);
+		super.onStop();
 	}
 
 }

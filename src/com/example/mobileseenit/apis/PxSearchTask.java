@@ -22,7 +22,7 @@ import com.fivehundredpx.api.PxApi;
 public class PxSearchTask extends AsyncTask<String, Void, String> {
 
 	// Number of images to load at once.
-	private static final int LOAD_COUNT = 5;
+	private static final int LOAD_COUNT = 7;
 
 	// Reference to the calling fragment (flickr)
 	private MainActivity g;
@@ -55,10 +55,10 @@ public class PxSearchTask extends AsyncTask<String, Void, String> {
 
 		// Initialize list of imageviews
 		photos = new LinkedList<PhotoWrapper>();
-
-		JSONObject j = pxApi
-				.get("/photos?image_size=4&geo=" + g.getLat().toString() + ",="
-						+ g.getLng().toString() + ","+g.getRadius()+"km"+"&rpp="+LOAD_COUNT);
+		String search = "/photos/search?image_size=4&geo="
+				+ g.getLat().toString() + "," + g.getLng().toString() + ","
+				+ g.getRadius() + "km&rpp=" + LOAD_COUNT;
+		JSONObject j = pxApi.get(search);
 		JSONArray photoJsonArray;
 		try {
 			photoJsonArray = j.getJSONArray("photos");
@@ -66,18 +66,13 @@ public class PxSearchTask extends AsyncTask<String, Void, String> {
 				JSONObject tempObject = (JSONObject) photoJsonArray.get(i);
 				String url = tempObject.getString("image_url");
 
-				// Checks if the photo isn't already in the photoList before
-				// adding
-				if (!g.getUrls().contains(url)) {
-					Bitmap b = process(url);
-					PhotoWrapper p = new PhotoWrapper(b, tempObject,
-							PhotoWrapper.PX_OBJECT);
-					photos.add(p);
-
-				}
+				Bitmap b = process(url);
+				PhotoWrapper p = new PhotoWrapper(b, tempObject,
+						PhotoWrapper.PX_OBJECT);
+				photos.add(p);
 
 			}
-			System.out.println();
+
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
