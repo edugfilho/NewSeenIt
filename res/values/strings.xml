@@ -23,7 +23,7 @@
     <string name="title_activity_image_details">ImageDetailsActivity</string>
     <string name="photo_title_label">Title:</string>
     <string name="photo_link_label">Link:</string>
-    <string name="settings_image_diameter_label">Search Radius:</string>
+    <string name="settings_image_diameter_label">Search Diameter:</string>
     <string name="settings_before_label">Images Before:</string>
     <string name="settings_after_label">Images After:</string>
     <string name="settings_flickr_label">Flickr:</string>

@@ -32,7 +32,7 @@ import com.example.mobileseenit.helpers.PhotoWrapper;
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 	// Number of images to load at once.
-	private static final int LOAD_COUNT = 10;
+	private static final int LOAD_COUNT = 15;
 
 	// Reference the activity
 	private MainActivity mainActivity;
