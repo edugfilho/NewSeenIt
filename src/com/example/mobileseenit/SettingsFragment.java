@@ -42,6 +42,7 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 	private Button selectAfter;
 	private Button selectBefore;
 	private Button set;
+	private Button reload;
 	private TextView beforeLabel;
 	private TextView afterLabel;
 	private DatePicker datePicker;
@@ -68,6 +69,16 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 				.findViewById(R.id.add_flickr_account_button);
 		flickrButton.setOnClickListener(this);
 
+		reload = (Button) v.findViewById(R.id.btnReload);
+		reload.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				mainActivity.reloadFragment(mainActivity.mainFragment);
+				
+			}
+		});
+		
 		// Set date pickers after & before
 		selectAfter = (Button) v.findViewById(R.id.btnSelectAfter);
 		selectBefore = (Button) v.findViewById(R.id.btnSelectBefore);

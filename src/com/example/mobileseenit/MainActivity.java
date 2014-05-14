@@ -19,6 +19,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
+
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.REST;
 import com.example.mobileseenit.apis.FlickrAuthRetrieveTask;
@@ -43,6 +44,7 @@ public class MainActivity extends FragmentActivity implements
 	// Fragments
 	MainFragment mainFragment;
 	SettingsFragment settingsFragment;
+	MapFragmentSeenIt mapFragment;
 
 	// user objects
 	FlickrUser flickrUser;
@@ -57,6 +59,13 @@ public class MainActivity extends FragmentActivity implements
 	Double radius;
 
 	SeenItLocation loc;
+
+	Integer numTabs = 4;
+	Integer numPageOffLimit = 3;
+	boolean hasPhotosDisplayed = false;
+	boolean locationAcquired = false;
+	
+	
 
 	// Settings
 	public boolean useDateRange;
@@ -92,10 +101,12 @@ public class MainActivity extends FragmentActivity implements
 		// Add your fragments here
 		mainFragment = new MainFragment();
 		settingsFragment = new SettingsFragment();
+		mapFragment = new MapFragmentSeenIt();
 		List<Fragment> fragments = new ArrayList<Fragment>();
 		fragments.add(mainFragment);
 		fragments.add(new ImageCaptureFragment());
 		fragments.add(settingsFragment);
+		fragments.add(mapFragment);
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
@@ -103,8 +114,10 @@ public class MainActivity extends FragmentActivity implements
 				getSupportFragmentManager(), fragments);
 
 		// Set up the ViewPager with the sections adapter.
+
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+		mViewPager.setOffscreenPageLimit(numPageOffLimit);
 
 		// When swiping between different sections, select the corresponding
 		// tab. We can also use ActionBar.Tab#select() to do this if we have
@@ -151,7 +164,7 @@ public class MainActivity extends FragmentActivity implements
 			retrieveTask.execute("");
 		}
 		mViewPager.setCurrentItem(0);
-
+		
 	}
 
 	// Can be called from search methods. Adds the PhotoWrappers to
@@ -162,6 +175,8 @@ public class MainActivity extends FragmentActivity implements
 			photoList.addAll(photos);
 			if (!mainFragment.isDetached())
 				mainFragment.updateDisplayedPhotos();
+				hasPhotosDisplayed = true;
+				mapFragment.reload();
 		}
 	}
 
@@ -289,8 +304,8 @@ public class MainActivity extends FragmentActivity implements
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
-			return 3;
+
+			return numTabs;
 		}
 
 		@Override
@@ -304,6 +319,8 @@ public class MainActivity extends FragmentActivity implements
 				return "Capture";
 			case 2:
 				return "Settings";
+			case 3:
+				return "Map";
 			}
 			return null;
 		}
@@ -340,6 +357,9 @@ public class MainActivity extends FragmentActivity implements
 
 	public void setLat(Double lat) {
 		this.lat = lat;
+		if (getLng() != null) {
+			locationAcquired = lat != null;
+		}
 	}
 
 	public Double getLng() {
@@ -348,6 +368,9 @@ public class MainActivity extends FragmentActivity implements
 
 	public void setLng(Double lng) {
 		this.lng = lng;
+		if (getLat() != null) {
+			locationAcquired = lng != null;
+		}
 	}
 
 	public SeenItLocation getLoc() {
@@ -451,6 +474,14 @@ public class MainActivity extends FragmentActivity implements
 		getLoc().getLocationManager().removeUpdates(
 				getLoc().locationListenerGps);
 		super.onStop();
+	}
+	
+	public void reloadFragment(Fragment fragment)
+	{
+		android.support.v4.app.FragmentTransaction frag = getSupportFragmentManager().beginTransaction();
+		frag.detach(fragment);
+		frag.attach(fragment);
+		frag.commit();
 	}
 
 }

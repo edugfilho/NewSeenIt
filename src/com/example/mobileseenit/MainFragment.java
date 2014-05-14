@@ -47,15 +47,15 @@ public class MainFragment extends Fragment implements OnTouchListener,
 
 					// if (mainActivity.getPhotoList().isEmpty()) {
 					Toast.makeText(mainActivity.getApplicationContext(),
-							"Location acquired. Displaying pictures",
+							"Location acquired. Downloading new photos",
 							Toast.LENGTH_SHORT).show();
 
 					flickrSearch = new FlickrSearchTask(getActivity());
 					flickrSearch.execute();
 
 					// Search 500px Images
-					pxSearchTask = new PxSearchTask(getActivity());
-					pxSearchTask.execute("search");
+					//pxSearchTask = new PxSearchTask(getActivity());
+					//pxSearchTask.execute("search");
 
 				}
 			});
@@ -90,23 +90,7 @@ public class MainFragment extends Fragment implements OnTouchListener,
 				false);
 
 		mainActivity = (MainActivity) getActivity();
-		return rootView;
-	}
-
-	@Override
-	public void onClick(View v) {
-
-	}
-
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onResume() {
-
+		
 		// Whenever GPS acquires location, the images are fetched and shown
 		mainActivity
 				.getLoc()
@@ -125,10 +109,28 @@ public class MainFragment extends Fragment implements OnTouchListener,
 						mainActivity.getRadius().floatValue() * 1000,
 						mainActivity.getLoc().locationListenerGps);
 		mainActivity.getLoc().getLocation(getActivity(), locationResult);
-
 		Toast.makeText(getActivity(), "Getting location...", Toast.LENGTH_SHORT)
-				.show();
-
-		super.onResume();
+		.show();
+		return rootView;
 	}
+
+	@Override
+	public void onClick(View v) {
+
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onStart() {
+
+		
+
+		super.onStart();
+	}
+	
 }

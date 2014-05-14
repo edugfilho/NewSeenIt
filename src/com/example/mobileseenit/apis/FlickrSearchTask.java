@@ -17,6 +17,7 @@ import com.aetrion.flickr.photos.Photo;
 import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
 import com.aetrion.flickr.photos.SearchParameters;
+import com.aetrion.flickr.photos.geo.GeoInterface;
 import com.example.mobileseenit.MainActivity;
 import com.example.mobileseenit.helpers.PhotoWrapper;
 
@@ -31,7 +32,7 @@ import com.example.mobileseenit.helpers.PhotoWrapper;
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 	// Number of images to load at once.
-	private static final int LOAD_COUNT = 7;
+	private static final int LOAD_COUNT = 10;
 
 	// Reference the activity
 	private MainActivity mainActivity;
@@ -97,6 +98,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 		// Initialize PhotosInterface object
 		PhotosInterface photosInterface = flickr.getPhotosInterface();
+		GeoInterface geoInterface = flickr.getGeoInterface();
 		// Execute search with entered tags
 		try {
 
@@ -110,6 +112,9 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 				for (int i = 0; i < photoList.size(); i++) {
 					// get photo object
 					Photo photo = (Photo) photoList.get(i);
+
+					// Adds geoinfo to the photo
+					photo.setGeoData(geoInterface.getLocation(photo.getId()));
 
 					// Checks if the photo isn't already in the photoList before
 					// adding
@@ -126,7 +131,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 					urlBuilder.append("_");
 					urlBuilder.append(photo.getSecret());
 					urlBuilder.append(".jpg");
-					
+
 					Bitmap b = process(urlBuilder.toString());
 
 					// Construct new photowrapper for each image.

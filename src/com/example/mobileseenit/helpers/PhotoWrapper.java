@@ -27,6 +27,9 @@ public class PhotoWrapper {
 	private Bitmap bitmap;
 	private HashMap<String, String> detailMap;
 
+	private Float lat;
+	private Float lng;
+
 	// Takes in a bitmap of the image, the photo object returned from the api,
 	// and a string constant type
 	public PhotoWrapper(Bitmap p, Object rawPhoto, String type) {
@@ -35,7 +38,7 @@ public class PhotoWrapper {
 		if (type.equals(FLICKR_OBJECT)) {
 			detailMap = processFlickr(rawPhoto);
 		} else if (type.equals(INSTAGRAM_OBJECT)) {
-			detailMap = processInstagrm(rawPhoto); 
+			detailMap = processInstagrm(rawPhoto);
 		} else if (type.equals(PX_OBJECT)) {
 			detailMap = processPx(rawPhoto);
 		}
@@ -48,6 +51,10 @@ public class PhotoWrapper {
 		Photo flickrPhoto = (Photo) o;
 		details.put(TITLE_FIELD, flickrPhoto.getTitle());
 		details.put(LINK_FIELD, flickrPhoto.getUrl());
+		if (flickrPhoto.hasGeoData()) {
+			setLat(flickrPhoto.getGeoData().getLatitude());
+			setLng(flickrPhoto.getGeoData().getLongitude());
+		}
 
 		return details;
 	}
@@ -73,6 +80,7 @@ public class PhotoWrapper {
 		try {
 			details.put(TITLE_FIELD, jsonPhoto.getString("description"));
 			details.put(LINK_FIELD, jsonPhoto.getString("image_url"));
+			// setLat(lat)
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -97,6 +105,22 @@ public class PhotoWrapper {
 
 	public void setDetailMap(HashMap<String, String> detailMap) {
 		this.detailMap = detailMap;
+	}
+
+	public Float getLat() {
+		return lat;
+	}
+
+	public void setLat(Float lat) {
+		this.lat = lat;
+	}
+
+	public Float getLng() {
+		return lng;
+	}
+
+	public void setLng(Float lng) {
+		this.lng = lng;
 	}
 
 }
