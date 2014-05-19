@@ -209,9 +209,8 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 		});
 
 		// Set Add 500px Account button click handler
-		ImageButton pxButton = (ImageButton) v
-				.findViewById(R.id.add_500px_account_button);
-		pxButton.setOnClickListener(this);
+
+		loginPx.setOnClickListener(this);
 
 		// Check for flickr user
 		FlickrUser flickrUser = ((MainActivity) getActivity()).getFlickrUser();

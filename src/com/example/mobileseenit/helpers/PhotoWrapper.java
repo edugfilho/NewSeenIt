@@ -29,6 +29,8 @@ public class PhotoWrapper {
 
 	private Float lat;
 	private Float lng;
+	
+	private int favs;
 
 	// Takes in a bitmap of the image, the photo object returned from the api,
 	// and a string constant type
@@ -45,12 +47,15 @@ public class PhotoWrapper {
 	}
 
 	// Convert the object returned by Flickr api to detail map
+	@SuppressWarnings("deprecation")
 	private HashMap<String, String> processFlickr(Object o) {
 		HashMap<String, String> details = new HashMap<String, String>();
 
 		Photo flickrPhoto = (Photo) o;
 		details.put(TITLE_FIELD, flickrPhoto.getTitle());
 		details.put(LINK_FIELD, flickrPhoto.getUrl());
+		setFavs(flickrPhoto.getViews());
+		
 		if (flickrPhoto.hasGeoData()) {
 			setLat(flickrPhoto.getGeoData().getLatitude());
 			setLng(flickrPhoto.getGeoData().getLongitude());
@@ -121,6 +126,14 @@ public class PhotoWrapper {
 
 	public void setLng(Float lng) {
 		this.lng = lng;
+	}
+
+	public int getFavs() {
+		return favs;
+	}
+
+	public void setFavs(int favs) {
+		this.favs = favs;
 	}
 
 }

@@ -2,6 +2,8 @@ package com.example.mobileseenit.apis;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import android.app.Activity;
@@ -13,6 +15,8 @@ import android.widget.Toast;
 
 import com.aetrion.flickr.Flickr;
 import com.aetrion.flickr.FlickrException;
+import com.aetrion.flickr.favorites.FavoritesInterface;
+import com.aetrion.flickr.photos.Extras;
 import com.aetrion.flickr.photos.Photo;
 import com.aetrion.flickr.photos.PhotoList;
 import com.aetrion.flickr.photos.PhotosInterface;
@@ -32,7 +36,7 @@ import com.example.mobileseenit.helpers.PhotoWrapper;
 public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 
 	// Number of images to load at once.
-	private static final int LOAD_COUNT = 15;
+	private static final int LOAD_COUNT = 7;
 
 	// Reference the activity
 	private MainActivity mainActivity;
@@ -90,15 +94,17 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 		searchParams.setLongitude(mainActivity.getLng().toString());
 		searchParams.setRadius(mainActivity.getRadius().intValue());
 		searchParams.setRadiusUnits("km");
+
 		if (mainActivity.useDateRange) {
 			searchParams.setMinTakenDate(mainActivity.getImgsAfter().getTime());
 			searchParams
 					.setMaxTakenDate(mainActivity.getImgsBefore().getTime());
 		}
 
-		// Initialize PhotosInterface object
+		// Initialize Photos & geo Interface object
 		PhotosInterface photosInterface = flickr.getPhotosInterface();
 		GeoInterface geoInterface = flickr.getGeoInterface();
+
 		// Execute search with entered tags
 		try {
 
@@ -113,6 +119,10 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 					// get photo object
 					Photo photo = (Photo) photoList.get(i);
 
+					//Taking advantage of a deprecated field to store favs count. This is really nasty.
+					int favs = photosInterface.getFavorites(photo.getId(), 100, 1).size();
+					photo.setViews(favs);
+					
 					// Adds geoinfo to the photo
 					photo.setGeoData(geoInterface.getLocation(photo.getId()));
 
@@ -130,10 +140,13 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 					urlBuilder.append(photo.getId());
 					urlBuilder.append("_");
 					urlBuilder.append(photo.getSecret());
+					// TODO \/ hardcoded for small images. Consider using
+					// photo.getSmallUrl instead
+					urlBuilder.append("_m");
 					urlBuilder.append(".jpg");
 
 					Bitmap b = process(urlBuilder.toString());
-
+					b.getByteCount();
 					// Construct new photowrapper for each image.
 					PhotoWrapper newPhoto = new PhotoWrapper(b,
 							photoList.get(i), PhotoWrapper.FLICKR_OBJECT);

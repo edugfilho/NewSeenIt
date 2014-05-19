@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -54,8 +56,8 @@ public class MainFragment extends Fragment implements OnTouchListener,
 					flickrSearch.execute();
 
 					// Search 500px Images
-					//pxSearchTask = new PxSearchTask(getActivity());
-					//pxSearchTask.execute("search");
+					// pxSearchTask = new PxSearchTask(getActivity());
+					// pxSearchTask.execute("search");
 
 				}
 			});
@@ -66,20 +68,40 @@ public class MainFragment extends Fragment implements OnTouchListener,
 
 	public void updateDisplayedPhotos() {
 		// Hide progress spinner
+
 		ProgressBar progressBar = (ProgressBar) getView().findViewById(
 				R.id.photo_load_progress_bar);
 		progressBar.setVisibility(View.GONE);
 
 		// Display images
 		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
-		LinearLayout r = (LinearLayout) getView().findViewById(
+		LinearLayout r1 = (LinearLayout) getView().findViewById(
 				R.id.photo_stream);
+		/*
+		 * LinearLayout r2 = (LinearLayout) getView().findViewById(
+		 * R.id.photo_stream3);
+		 */
+		// ArrayList<PhotoStreamImageView> wrappedPhotos = new
+		// ArrayList<PhotoStreamImageView>();
+		// boolean first = true;
 		for (PhotoWrapper p : photos) {
 
 			PhotoStreamImageView newImage = new PhotoStreamImageView(
 					getActivity(), p);
-			r.addView(newImage);
+			// wrappedPhotos.add(newImage);
+			// if (first) {
+			r1.addView(newImage);
+			/*
+			 * } else { r2.addView(newImage); } first = !first;
+			 */
 		}
+		/*
+		 * ArrayAdapter<PhotoStreamImageView> adapter = new
+		 * ArrayAdapter<PhotoStreamImageView>( mainActivity,
+		 * android.R.layout.simple_gallery_item, wrappedPhotos);
+		 * r.setAdapter(adapter);
+		 */
+
 	}
 
 	@Override
@@ -90,7 +112,7 @@ public class MainFragment extends Fragment implements OnTouchListener,
 				false);
 
 		mainActivity = (MainActivity) getActivity();
-		
+
 		// Whenever GPS acquires location, the images are fetched and shown
 		mainActivity
 				.getLoc()
@@ -110,7 +132,7 @@ public class MainFragment extends Fragment implements OnTouchListener,
 						mainActivity.getLoc().locationListenerGps);
 		mainActivity.getLoc().getLocation(getActivity(), locationResult);
 		Toast.makeText(getActivity(), "Getting location...", Toast.LENGTH_SHORT)
-		.show();
+				.show();
 		return rootView;
 	}
 
@@ -128,9 +150,7 @@ public class MainFragment extends Fragment implements OnTouchListener,
 	@Override
 	public void onStart() {
 
-		
-
 		super.onStart();
 	}
-	
+
 }

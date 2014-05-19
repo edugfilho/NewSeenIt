@@ -1,6 +1,8 @@
 package com.example.mobileseenit;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -25,6 +27,9 @@ public class MapFragmentSeenIt extends Fragment {
 	MainActivity mainActivity;
 	GoogleMap gmap;
 	MapView mMapView;
+
+	static final int MAX_ICON_WIDTH = 130;
+	static final int MAX_ICON_HEIGHT = 100;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,26 +67,39 @@ public class MapFragmentSeenIt extends Fragment {
 			gmap.addMarker(opt1);
 		}
 		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
+		Collections.sort(photos, new CustomComparator());
+		int maxFavs = photos.get(photos.size()-1).getFavs();
 		for (PhotoWrapper photoWrapper : photos) {
 			if (photoWrapper.getLat() != null) {
 				MarkerOptions opt = new MarkerOptions();
 				opt.position(new LatLng(photoWrapper.getLat(), photoWrapper
 						.getLng()));
+				float coef = (float)photoWrapper.getFavs()/(float)maxFavs;
+				int width = Math.round(MAX_ICON_WIDTH*coef);
+				int height = Math.round(MAX_ICON_HEIGHT*coef);
 				Bitmap bmIcon = Bitmap.createScaledBitmap(
-						photoWrapper.getBitmap(), 100, 100, true);
+						photoWrapper.getBitmap(), width,
+						height, true);
 				opt.title(photoWrapper.getDetailMap().get(
 						PhotoWrapper.TITLE_FIELD));
 				opt.icon(BitmapDescriptorFactory.fromBitmap(bmIcon));
+
 				gmap.addMarker(opt);
 
 			}
 		}
 		LatLng myLatLng = new LatLng(mainActivity.lat, mainActivity.lng);
-		gmap.addCircle(new CircleOptions()
-	     .center(myLatLng)
-	     .radius(mainActivity.radius*1000*2)
-	     .strokeColor(Color.BLUE)
-	     .fillColor(Color.TRANSPARENT));
+		gmap.addCircle(new CircleOptions().center(myLatLng)
+				.radius(mainActivity.radius * 1000 * 2).strokeColor(Color.BLUE)
+				.fillColor(Color.TRANSPARENT));
 		gmap.animateCamera(CameraUpdateFactory.newLatLng(myLatLng));
+	}
+
+	public class CustomComparator implements Comparator<PhotoWrapper> {
+		@Override
+		public int compare(PhotoWrapper o1, PhotoWrapper o2) {
+			return Integer.valueOf(o1.getFavs()).compareTo(
+					Integer.valueOf(o2.getFavs()));
+		}
 	}
 }
