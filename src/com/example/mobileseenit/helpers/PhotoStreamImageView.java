@@ -1,8 +1,5 @@
 package com.example.mobileseenit.helpers;
 
-import com.example.mobileseenit.ImageDialogSeenIt;
-import com.example.mobileseenit.MainActivity;
-
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.view.View;
@@ -10,6 +7,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.example.mobileseenit.ImageDialogSeenIt;
+import com.example.mobileseenit.MainActivity;
 
 
 /**

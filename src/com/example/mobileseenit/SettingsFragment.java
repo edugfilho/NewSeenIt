@@ -75,7 +75,7 @@ public class SettingsFragment extends Fragment implements OnTouchListener,
 			@Override
 			public void onClick(View v) {
 				mainActivity.reloadFragment(mainActivity.mainFragment);
-				
+				mainActivity.switchToFragment(mainActivity.mainFragment);
 			}
 		});
 		

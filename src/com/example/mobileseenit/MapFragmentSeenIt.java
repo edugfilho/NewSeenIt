@@ -20,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapFragmentSeenIt extends Fragment {
@@ -27,9 +28,15 @@ public class MapFragmentSeenIt extends Fragment {
 	MainActivity mainActivity;
 	GoogleMap gmap;
 	MapView mMapView;
+	ArrayList<Marker> markers;
+	LatLng zoomIn;
 
 	static final int MAX_ICON_WIDTH = 130;
 	static final int MAX_ICON_HEIGHT = 100;
+	
+	final static long MAX_ZOOM = 21;
+	final static long MED_ZOOM = 17;
+	final static long LOW_ZOOM = 10;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,8 +49,8 @@ public class MapFragmentSeenIt extends Fragment {
 				R.id.mapview)).getMap();
 
 		mainActivity = (MainActivity) getActivity();
-		gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
-				-19.825576, -43.950723), 14.0f));
+
+		markers = new ArrayList<Marker>();
 
 		return rootView;
 	}
@@ -53,9 +60,20 @@ public class MapFragmentSeenIt extends Fragment {
 		super.onStart();
 	}
 
+	// TODO optimize this
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		if (zoomIn == null) {
+			if (mainActivity.getLat() != null && mainActivity.getLng() != null) {
+				gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+						mainActivity.getLat(), mainActivity.getLng()), MED_ZOOM));
+			} else {
+				gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+						-19.825576, -43.950723), LOW_ZOOM));
+			}
+		}
 	}
 
 	public void reload() {
@@ -64,27 +82,26 @@ public class MapFragmentSeenIt extends Fragment {
 			MarkerOptions opt1 = new MarkerOptions();
 			opt1.position(new LatLng(mainActivity.getLat(), mainActivity
 					.getLng()));
-			gmap.addMarker(opt1);
+			markers.add(gmap.addMarker(opt1));
 		}
 		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
 		Collections.sort(photos, new CustomComparator());
-		int maxFavs = photos.get(photos.size()-1).getFavs();
+		int maxFavs = photos.get(photos.size() - 1).getFavs();
 		for (PhotoWrapper photoWrapper : photos) {
 			if (photoWrapper.getLat() != null) {
 				MarkerOptions opt = new MarkerOptions();
 				opt.position(new LatLng(photoWrapper.getLat(), photoWrapper
 						.getLng()));
-				float coef = (float)photoWrapper.getFavs()/(float)maxFavs;
-				int width = Math.round(MAX_ICON_WIDTH*coef);
-				int height = Math.round(MAX_ICON_HEIGHT*coef);
+				//float coef = (float) photoWrapper.getFavs() / (float) maxFavs;
+				int width = MAX_ICON_WIDTH;//Math.round(MAX_ICON_WIDTH * coef);
+				int height = MAX_ICON_HEIGHT;//Math.round(MAX_ICON_HEIGHT * coef);
 				Bitmap bmIcon = Bitmap.createScaledBitmap(
-						photoWrapper.getBitmap(), width,
-						height, true);
+						photoWrapper.getBitmap(), width, height, true);
 				opt.title(photoWrapper.getDetailMap().get(
 						PhotoWrapper.TITLE_FIELD));
 				opt.icon(BitmapDescriptorFactory.fromBitmap(bmIcon));
 
-				gmap.addMarker(opt);
+				markers.add(gmap.addMarker(opt));
 
 			}
 		}
@@ -101,5 +118,15 @@ public class MapFragmentSeenIt extends Fragment {
 			return Integer.valueOf(o1.getFavs()).compareTo(
 					Integer.valueOf(o2.getFavs()));
 		}
+	}
+
+	public LatLng getZoomIn() {
+		return zoomIn;
+	}
+
+	public void setZoomIn(LatLng zoomIn) {
+		this.zoomIn = zoomIn;
+		gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(zoomIn, MED_ZOOM));
+		this.zoomIn = null;
 	}
 }

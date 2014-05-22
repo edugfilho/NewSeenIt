@@ -71,6 +71,8 @@ public class MainActivity extends FragmentActivity implements
 	public Calendar imgsBefore;
 
 	private final static int NUMBER_OF_PHOTOS = 7;
+	
+	List<Fragment> fragments;
 
 	// token
 	String flickr_token;
@@ -102,7 +104,7 @@ public class MainActivity extends FragmentActivity implements
 		mainFragment = new MainFragment();
 		settingsFragment = new SettingsFragment();
 		mapFragment = new MapFragmentSeenIt();
-		List<Fragment> fragments = new ArrayList<Fragment>();
+		fragments = new ArrayList<Fragment>();
 		fragments.add(mainFragment);
 		fragments.add(new ImageCaptureFragment());
 		fragments.add(settingsFragment);
@@ -184,7 +186,7 @@ public class MainActivity extends FragmentActivity implements
 	// the current list
 	public void addOnePhoto(PhotoWrapper photo) {
 		synchronized (photoList) {
-			
+
 			photoList.add(photo);
 			if (!mainFragment.isDetached())
 				mainFragment.updateDisplayedPhotos();
@@ -488,9 +490,12 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onStop() {
 		// Stops any location request
-		getLoc().getLocationManager().removeUpdates(
-				getLoc());
+		getLoc().getLocationManager().removeUpdates(getLoc());
 		super.onStop();
+	}
+
+	public void switchToFragment(Fragment destination) {
+		mViewPager.setCurrentItem(fragments.indexOf(destination));
 	}
 
 	public void reloadFragment(Fragment fragment) {

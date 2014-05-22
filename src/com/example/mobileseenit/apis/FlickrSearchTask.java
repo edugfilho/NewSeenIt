@@ -50,7 +50,7 @@ public class FlickrSearchTask extends AsyncTask<String, Void, String> {
 	/** application context. */
 	@Override
 	protected void onPreExecute() {
-		dialog = ProgressDialog.show(mainActivity, "", "Please Wait",
+		dialog = ProgressDialog.show(mainActivity, "", "Loading photos, please wait...",
 				false);
 	}
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,8 +17,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.mobileseenit.SeenItLocation.LocationResult;
@@ -52,7 +51,7 @@ public class MainFragment extends Fragment implements OnTouchListener,
 			Toast.makeText(
 					mainActivity.getApplicationContext(),
 					"Location acquired by " + provider
-							+ ". Downloading new photos", Toast.LENGTH_SHORT)
+							+ ". Downloading new photos", Toast.LENGTH_LONG)
 					.show();
 			mainActivity.runOnUiThread(new Runnable() {
 				@Override
@@ -95,26 +94,42 @@ public class MainFragment extends Fragment implements OnTouchListener,
 
 		mainActivity = (MainActivity) getActivity();
 
-		// Whenever GPS acquires location, the images are fetched and shown
-		mainActivity
-				.getLoc()
-				.getLocationManager()
-				.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
-						mainActivity.getRadius().floatValue() * 1000,
-						mainActivity.getLoc());
-		// mainActivity.getLoc().getLocation(getActivity(), locationResult);
-
-		mainActivity
-				.getLoc()
-				.getLocationManager()
-				.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
-						mainActivity.getRadius().floatValue() * 1000,
-						mainActivity.getLoc());
-		mainActivity.getLoc().getLocation(getActivity(), locationResult);
+		// Whenever it acquires location, the images are fetched and shown
 		Toast.makeText(getActivity(), "Getting location...", Toast.LENGTH_SHORT)
-				.show();
+		.show();
+		if (mainActivity.getLoc().getLocationManager()
+				.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+			mainActivity
+					.getLoc()
+					.getLocationManager()
+					.requestLocationUpdates(
+							LocationManager.NETWORK_PROVIDER,
+							mainActivity.getLoc()
+									.getUpdateIntervalTimeMilisec(),
+							mainActivity.getRadius().floatValue() * 1000,
+							mainActivity.getLoc());
+			mainActivity.getLoc().getLocation(getActivity(), locationResult);
+		} else if (mainActivity.getLoc().getLocationManager()
+				.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+			mainActivity
+					.getLoc()
+					.getLocationManager()
+					.requestLocationUpdates(
+							LocationManager.GPS_PROVIDER,
+							mainActivity.getLoc()
+									.getUpdateIntervalTimeMilisec(),
+							mainActivity.getRadius().floatValue() * 1000,
+							mainActivity.getLoc());
+			mainActivity.getLoc().getLocation(getActivity(), locationResult);
+			
+		}
+		else
+		{
+			Toast.makeText(getActivity(), "All location providers are disabled!", Toast.LENGTH_LONG)
+			.show();
+		}
+
+		
 		return rootView;
 	}
 

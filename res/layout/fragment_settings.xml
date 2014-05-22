@@ -33,7 +33,7 @@
 
                 <Spinner
                     android:id="@+id/spinner1"
-                    android:layout_width="110dp"
+                    android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:entries="@array/SearchDiameters" />
@@ -52,7 +52,7 @@
 
                 <TextView
                     android:id="@+id/settings_after_label"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.21"
                     android:text="@string/settings_after_label"
@@ -79,7 +79,7 @@
 
                 <TextView
                     android:id="@+id/settings_before_label"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dip"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.47"
                     android:text="@string/settings_before_label"
