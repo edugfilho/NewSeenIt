@@ -2,6 +2,7 @@ package com.example.mobileseenit;
 
 import java.util.ArrayList;
 
+import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -12,8 +13,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -32,25 +34,29 @@ public class MainFragment extends Fragment implements OnTouchListener,
 	FlickrSearchTask flickrSearch;
 	MainActivity mainActivity;
 
+	Integer[] imageIDs = { R.drawable.loading, R.drawable.loading,
+			R.drawable.loading, R.drawable.loading, R.drawable.loading,
+			R.drawable.loading, R.drawable.loading };
+
 	LocationResult locationResult = new LocationResult() {
 		@Override
 		public void gotLocation(Location location) {
+			String provider = location.getProvider();
 
 			// It's called only when the location is changed. Now that it has
-			// new
-			// lat and lng, it can search for new photos
+			// new lat and lng, it can search for new photos
 
 			mainActivity.setLat(location.getLatitude());
 			mainActivity.setLng(location.getLongitude());
 
+			Toast.makeText(
+					mainActivity.getApplicationContext(),
+					"Location acquired by " + provider
+							+ ". Downloading new photos", Toast.LENGTH_SHORT)
+					.show();
 			mainActivity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-
-					// if (mainActivity.getPhotoList().isEmpty()) {
-					Toast.makeText(mainActivity.getApplicationContext(),
-							"Location acquired. Downloading new photos",
-							Toast.LENGTH_SHORT).show();
 
 					flickrSearch = new FlickrSearchTask(getActivity());
 					flickrSearch.execute();
@@ -67,40 +73,16 @@ public class MainFragment extends Fragment implements OnTouchListener,
 	};
 
 	public void updateDisplayedPhotos() {
+		photos = mainActivity.getPhotoList();
 		// Hide progress spinner
-
-		ProgressBar progressBar = (ProgressBar) getView().findViewById(
-				R.id.photo_load_progress_bar);
-		progressBar.setVisibility(View.GONE);
-
+		/*
+		 * getView().findViewById(R.id.photo_load_progress_bar).setVisibility(
+		 * View.GONE);
+		 */
 		// Display images
-		ArrayList<PhotoWrapper> photos = mainActivity.getPhotoList();
-		LinearLayout r1 = (LinearLayout) getView().findViewById(
-				R.id.photo_stream);
-		/*
-		 * LinearLayout r2 = (LinearLayout) getView().findViewById(
-		 * R.id.photo_stream3);
-		 */
-		// ArrayList<PhotoStreamImageView> wrappedPhotos = new
-		// ArrayList<PhotoStreamImageView>();
-		// boolean first = true;
-		for (PhotoWrapper p : photos) {
-
-			PhotoStreamImageView newImage = new PhotoStreamImageView(
-					getActivity(), p);
-			// wrappedPhotos.add(newImage);
-			// if (first) {
-			r1.addView(newImage);
-			/*
-			 * } else { r2.addView(newImage); } first = !first;
-			 */
-		}
-		/*
-		 * ArrayAdapter<PhotoStreamImageView> adapter = new
-		 * ArrayAdapter<PhotoStreamImageView>( mainActivity,
-		 * android.R.layout.simple_gallery_item, wrappedPhotos);
-		 * r.setAdapter(adapter);
-		 */
+		GridView gridView = (GridView) getView().findViewById(R.id.gridview);
+		gridView.setVisibility(View.VISIBLE);
+		gridView.setAdapter(new ImageAdapter(mainActivity));
 
 	}
 
@@ -120,8 +102,8 @@ public class MainFragment extends Fragment implements OnTouchListener,
 				.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
 						mainActivity.getRadius().floatValue() * 1000,
-						mainActivity.getLoc().locationListenerGps);
-		mainActivity.getLoc().getLocation(getActivity(), locationResult);
+						mainActivity.getLoc());
+		// mainActivity.getLoc().getLocation(getActivity(), locationResult);
 
 		mainActivity
 				.getLoc()
@@ -129,7 +111,7 @@ public class MainFragment extends Fragment implements OnTouchListener,
 				.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
 						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
 						mainActivity.getRadius().floatValue() * 1000,
-						mainActivity.getLoc().locationListenerGps);
+						mainActivity.getLoc());
 		mainActivity.getLoc().getLocation(getActivity(), locationResult);
 		Toast.makeText(getActivity(), "Getting location...", Toast.LENGTH_SHORT)
 				.show();
@@ -153,4 +135,41 @@ public class MainFragment extends Fragment implements OnTouchListener,
 		super.onStart();
 	}
 
+	public class ImageAdapter extends BaseAdapter {
+		private Context context;
+
+		public ImageAdapter(Context c) {
+			context = c;
+		}
+
+		// ---returns the number of images---
+		public int getCount() {
+			return photos.size();
+		}
+
+		// ---returns the ID of an item---
+		public Object getItem(int position) {
+			return position;
+		}
+
+		public long getItemId(int position) {
+			return position;
+		}
+
+		// ---returns an ImageView view---
+		public View getView(int position, View convertView, ViewGroup parent) {
+			PhotoStreamImageView imageView;
+			if (convertView == null) {
+				imageView = new PhotoStreamImageView(context,
+						photos.get(position));
+				imageView.setLayoutParams(new GridView.LayoutParams(185, 185));
+				imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+				imageView.setPadding(5, 5, 5, 5);
+			} else {
+				imageView = (PhotoStreamImageView) convertView;
+			}
+			imageView.setImageBitmap(photos.get(position).getBitmap());
+			return imageView;
+		}
+	}
 }

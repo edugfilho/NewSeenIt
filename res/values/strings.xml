@@ -36,7 +36,7 @@
         <item>5 km</item>
     </string-array>
 
-    <color name="background_colour">#6D89D5</color>
+    <color name="background_colour">#003366</color>
     <color name="white">#FFFFFF</color>
 
 </resources>

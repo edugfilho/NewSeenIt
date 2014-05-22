@@ -53,54 +53,11 @@ public class SeenItLocation implements LocationListener {
 		return true;
 	}
 
-	LocationListener locationListenerGps = new LocationListener() {
-		@Override
-		public void onLocationChanged(Location location) {
-			//timer1.cancel();
-			locationResult.gotLocation(location);
-			// locationManager.removeUpdates(this);
-			// locationManager.removeUpdates(locationListenerNetwork);
-		}
-
-		@Override
-		public void onProviderDisabled(String provider) {
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-	};
-
-	LocationListener locationListenerNetwork = new LocationListener() {
-		@Override
-		public void onLocationChanged(Location location) {
-			timer1.cancel();
-			locationResult.gotLocation(location);
-			// locationManager.removeUpdates(this);
-			// locationManager.removeUpdates(locationListenerGps);
-		}
-
-		@Override
-		public void onProviderDisabled(String provider) {
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-		}
-	};
-
 	@Override
-	public void onLocationChanged(Location arg0) {
+	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
-
+		getLocationManager().removeUpdates(this);
+		locationResult.gotLocation(location);
 	}
 
 	@Override

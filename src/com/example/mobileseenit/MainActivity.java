@@ -64,13 +64,13 @@ public class MainActivity extends FragmentActivity implements
 	Integer numPageOffLimit = 3;
 	boolean hasPhotosDisplayed = false;
 	boolean locationAcquired = false;
-	
-	
 
 	// Settings
 	public boolean useDateRange;
 	public Calendar imgsAfter;
 	public Calendar imgsBefore;
+
+	private final static int NUMBER_OF_PHOTOS = 7;
 
 	// token
 	String flickr_token;
@@ -164,7 +164,7 @@ public class MainActivity extends FragmentActivity implements
 			retrieveTask.execute("");
 		}
 		mViewPager.setCurrentItem(0);
-		
+
 	}
 
 	// Can be called from search methods. Adds the PhotoWrappers to
@@ -175,8 +175,21 @@ public class MainActivity extends FragmentActivity implements
 			photoList.addAll(photos);
 			if (!mainFragment.isDetached())
 				mainFragment.updateDisplayedPhotos();
-				hasPhotosDisplayed = true;
-				mapFragment.reload();
+			hasPhotosDisplayed = true;
+			mapFragment.reload();
+		}
+	}
+
+	// Can be called from search methods. Adds the PhotoWrappers to
+	// the current list
+	public void addOnePhoto(PhotoWrapper photo) {
+		synchronized (photoList) {
+			
+			photoList.add(photo);
+			if (!mainFragment.isDetached())
+				mainFragment.updateDisplayedPhotos();
+			hasPhotosDisplayed = true;
+			mapFragment.reload();
 		}
 	}
 
@@ -215,6 +228,10 @@ public class MainActivity extends FragmentActivity implements
 		synchronized (photoList) {
 			this.photoList = photoList;
 		}
+	}
+
+	public int getNumberOfPhotos() {
+		return NUMBER_OF_PHOTOS;
 	}
 
 	/**
@@ -472,13 +489,13 @@ public class MainActivity extends FragmentActivity implements
 	public void onStop() {
 		// Stops any location request
 		getLoc().getLocationManager().removeUpdates(
-				getLoc().locationListenerGps);
+				getLoc());
 		super.onStop();
 	}
-	
-	public void reloadFragment(Fragment fragment)
-	{
-		android.support.v4.app.FragmentTransaction frag = getSupportFragmentManager().beginTransaction();
+
+	public void reloadFragment(Fragment fragment) {
+		android.support.v4.app.FragmentTransaction frag = getSupportFragmentManager()
+				.beginTransaction();
 		frag.detach(fragment);
 		frag.attach(fragment);
 		frag.commit();
