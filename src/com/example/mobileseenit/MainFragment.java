@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -94,42 +93,28 @@ public class MainFragment extends Fragment implements OnTouchListener,
 
 		mainActivity = (MainActivity) getActivity();
 
-		// Whenever it acquires location, the images are fetched and shown
 		Toast.makeText(getActivity(), "Getting location...", Toast.LENGTH_SHORT)
 		.show();
-		if (mainActivity.getLoc().getLocationManager()
-				.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-			mainActivity
-					.getLoc()
-					.getLocationManager()
-					.requestLocationUpdates(
-							LocationManager.NETWORK_PROVIDER,
-							mainActivity.getLoc()
-									.getUpdateIntervalTimeMilisec(),
-							mainActivity.getRadius().floatValue() * 1000,
-							mainActivity.getLoc());
-			mainActivity.getLoc().getLocation(getActivity(), locationResult);
-		} else if (mainActivity.getLoc().getLocationManager()
-				.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-			mainActivity
-					.getLoc()
-					.getLocationManager()
-					.requestLocationUpdates(
-							LocationManager.GPS_PROVIDER,
-							mainActivity.getLoc()
-									.getUpdateIntervalTimeMilisec(),
-							mainActivity.getRadius().floatValue() * 1000,
-							mainActivity.getLoc());
-			mainActivity.getLoc().getLocation(getActivity(), locationResult);
-			
-		}
-		else
-		{
-			Toast.makeText(getActivity(), "All location providers are disabled!", Toast.LENGTH_LONG)
-			.show();
-		}
-
 		
+		// Whenever GPS acquires location, the images are fetched and shown
+		mainActivity
+				.getLoc()
+				.getLocationManager()
+				.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
+						mainActivity.getRadius().floatValue() * 1000,
+						mainActivity.getLoc());
+		// mainActivity.getLoc().getLocation(getActivity(), locationResult);
+
+		mainActivity
+				.getLoc()
+				.getLocationManager()
+				.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+						mainActivity.getLoc().getUpdateIntervalTimeMilisec(),
+						mainActivity.getRadius().floatValue() * 1000,
+						mainActivity.getLoc());
+		mainActivity.getLoc().getLocation(getActivity(), locationResult);
+
 		return rootView;
 	}
 
